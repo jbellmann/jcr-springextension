@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="common-context.xml"/>
+	
+	<bean id="repository"
+		class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean">
+		<!-- normal factory beans params -->
+		<property name="configuration" value="/org/springmodules/jcr/jackrabbit/jackrabbit-repo.xml" />
+		<!-- use the target folder which will be cleaned  -->
+		<property name="homeDir" value="file:./target/stress-repo" />
+	</bean>
+</beans>
