@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.springmodules</groupId>
-    <artifactId>spring-modules-jcr</artifactId>
+    <groupId>org.springframework</groupId>
+    <artifactId>se-jcr</artifactId>
     <packaging>jar</packaging>
     <version>0.9-SNAPSHOT</version>
-    <name>spring-modules-jcr</name>
-    <url>https://springmodules.dev.java.net/</url>
+    <name>Spring Extension JCR</name>
+    <url>http://www.springsource.org/extensions/se-jcr</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -14,7 +14,7 @@
         </license>
     </licenses>
     <scm>
-        <url></url>
+        <url>https://src.springframework.org/svn/se-jcr</url>
     </scm>
     <dependencies>
         <dependency>
