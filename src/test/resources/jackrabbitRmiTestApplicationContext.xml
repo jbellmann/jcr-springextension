@@ -3,13 +3,13 @@
     "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-	<import resource="common-context.xml" />
+	<import resource="commonApplicationContext.xml" />
 
 	<!-- normal repository -->	
 	<bean id="repository"
-		class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean">
+		class="org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean">
 		<!-- normal factory beans params -->
-		<property name="configuration" value="/org/springmodules/jcr/jackrabbit/jackrabbit-repo.xml" />
+		<property name="configuration" value="jackrabbitRepositoryConfiguration.xml" />
 		<!-- use the target folder which will be cleaned  -->
 		<property name="homeDir" value="file:./target/repo" />
 	</bean>
@@ -20,7 +20,7 @@
 	<bean id="rmiRegistry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
 	</bean>
 	
-	<bean id="rmiServer" class="org.springmodules.jcr.jackrabbit.RmiServerRepositoryFactoryBean">
+	<bean id="rmiServer" class="org.springframework.extensions.jcr.jackrabbit.RmiServerRepositoryFactoryBean">
 		<property name="repository" ref="repository"/>
 		<property name="remoteAdapterFactory">
 			<bean class="org.apache.jackrabbit.rmi.server.ServerAdapterFactory"/>

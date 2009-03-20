@@ -346,7 +346,7 @@
         <programlisting>&lt;!-- normal repository --&gt;
 &lt;bean id="repository" class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean"&gt;
    &lt;!-- normal factory beans params --&gt;
-   &lt;property name="configuration" value="/org/springmodules/jcr/jackrabbit/jackrabbit-repo.xml" /&gt;
+   &lt;property name="configuration" value="/org/springframework/extensions/jcr/jackrabbit/jackrabbit-repo.xml" /&gt;
    &lt;!-- use the target folder which will be cleaned  --&gt;
    &lt;property name="homeDir" value="file:./target/repo" /&gt;
 &lt;/bean&gt;

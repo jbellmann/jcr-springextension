@@ -1,8 +1,17 @@
 /**
- * Created on Aug 31, 2005
+ * Copyright 2009 the original author or authors
  *
- * $Id: RepositoryFactoryBean.java,v 1.2 2006/07/03 22:07:31 costin Exp $
- * $Revision: 1.2 $
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
@@ -24,10 +33,14 @@ import org.xml.sax.InputSource;
  * 
  * 
  * @see org.springframework.jndi.JndiObjectFactoryBean
+ * 
  * @author Costin Leau
+ * @author Sergio Bossa 
+ * @author Salvatore Incandela
  * 
  */
-public class RepositoryFactoryBean extends org.springframework.extensions.jcr.RepositoryFactoryBean {
+public class RepositoryFactoryBean extends
+		org.springframework.extensions.jcr.RepositoryFactoryBean {
 
 	/**
 	 * Default repository configuration file.
@@ -50,7 +63,7 @@ public class RepositoryFactoryBean extends org.springframework.extensions.jcr.Re
 	private RepositoryConfig repositoryConfig;
 
 	/**
-	 * @see org.springmodules.jcr.RepositoryFactoryBean#createRepository()
+	 * @see org.springframework.extensions.jcr.RepositoryFactoryBean#createRepository()
 	 */
 	protected Repository createRepository() throws Exception {
 		// return JackRabbit repository.
@@ -58,7 +71,7 @@ public class RepositoryFactoryBean extends org.springframework.extensions.jcr.Re
 	}
 
 	/**
-	 * @see org.springmodules.jcr.RepositoryFactoryBean#resolveConfigurationResource()
+	 * @see org.springframework.extensions.jcr.RepositoryFactoryBean#resolveConfigurationResource()
 	 */
 	protected void resolveConfigurationResource() throws Exception {
 		// read the configuration object
@@ -67,18 +80,23 @@ public class RepositoryFactoryBean extends org.springframework.extensions.jcr.Re
 
 		if (this.configuration == null) {
 			if (log.isDebugEnabled())
-				log.debug("no configuration resource specified, using the default one:" + DEFAULT_CONF_FILE);
+				log
+						.debug("no configuration resource specified, using the default one:"
+								+ DEFAULT_CONF_FILE);
 			configuration = new ClassPathResource(DEFAULT_CONF_FILE);
 		}
 
 		if (homeDir == null) {
 			if (log.isDebugEnabled())
-				log.debug("no repository home dir specified, using the default one:" + DEFAULT_REP_DIR);
+				log
+						.debug("no repository home dir specified, using the default one:"
+								+ DEFAULT_REP_DIR);
 			homeDir = new FileSystemResource(DEFAULT_REP_DIR);
 		}
 
-		repositoryConfig = RepositoryConfig.create(new InputSource(configuration.getInputStream()),
-				homeDir.getFile().getAbsolutePath());
+		repositoryConfig = RepositoryConfig.create(new InputSource(
+				configuration.getInputStream()), homeDir.getFile()
+				.getAbsolutePath());
 	}
 
 	/**
@@ -99,7 +117,8 @@ public class RepositoryFactoryBean extends org.springframework.extensions.jcr.Re
 	}
 
 	/**
-	 * @param defaultRepDir The defaultRepDir to set.
+	 * @param defaultRepDir
+	 *            The defaultRepDir to set.
 	 */
 	public void setHomeDir(Resource defaultRepDir) {
 		this.homeDir = defaultRepDir;
@@ -113,7 +132,8 @@ public class RepositoryFactoryBean extends org.springframework.extensions.jcr.Re
 	}
 
 	/**
-	 * @param repositoryConfig The repositryConfig to set.
+	 * @param repositoryConfig
+	 *            The repositryConfig to set.
 	 */
 	public void setRepositoryConfig(RepositoryConfig repositoryConfig) {
 		this.repositoryConfig = repositoryConfig;

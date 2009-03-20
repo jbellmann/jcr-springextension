@@ -1,8 +1,17 @@
 /**
- * Created on Nov 10, 2005
+ * Copyright 2009 the original author or authors
  *
- * $Id: ListSessionHolderProviderManager.java,v 1.1 2005/12/20 17:38:16 costin Exp $
- * $Revision: 1.1 $
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.support;
 
@@ -10,25 +19,30 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * List based implementation of SessionHolderProviderManager. This class should is intended mainly
- * for testing or for declaring SessionHolderProviders in Spring context files. 
+ * List based implementation of SessionHolderProviderManager. This class should
+ * is intended mainly for testing or for declaring SessionHolderProviders in
+ * Spring context files.
  * 
  * @author Costin Leau
- *
+ * @author Sergio Bossa
+ * @author Salvatore Incandela
+ * 
  */
-public class ListSessionHolderProviderManager extends CacheableSessionHolderProviderManager {
+public class ListSessionHolderProviderManager extends
+		CacheableSessionHolderProviderManager {
 
 	private List providers = Collections.EMPTY_LIST;
-	
+
 	/**
-	 * @see org.springmodules.jcr.support.AbstractSessionHolderProviderManager#getProviders()
+	 * @see org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager#getProviders()
 	 */
 	public List getProviders() {
 		return providers;
 	}
 
 	/**
-	 * @param providers The providers to set.
+	 * @param providers
+	 *            The providers to set.
 	 */
 	public void setProviders(List providers) {
 		this.providers = providers;

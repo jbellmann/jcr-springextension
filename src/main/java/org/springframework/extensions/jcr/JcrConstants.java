@@ -1,8 +1,17 @@
 /**
- * Created on Nov 15, 2005
+ * Copyright 2009 the original author or authors
  *
- * $Id: JcrConstants.java,v 1.1 2005/12/20 17:38:08 costin Exp $
- * $Revision: 1.1 $
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr;
 
@@ -13,11 +22,12 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 /**
- * This class contains the some of the item names predefined by the JCR spec 1.0 (like
- * 'jcr', 'nt', 'mix'). The class is namespace aware (that's why it's not static)
- * and will return the correct name if the namespace prefixes are changed (from 'jcr' to 'foo' for
- * example). If the cache is enabled, it will be populated in lazy manner (once a certain property is looked up). 
- *  
+ * This class contains the some of the item names predefined by the JCR spec 1.0
+ * (like 'jcr', 'nt', 'mix'). The class is namespace aware (that's why it's not
+ * static) and will return the correct name if the namespace prefixes are
+ * changed (from 'jcr' to 'foo' for example). If the cache is enabled, it will
+ * be populated in lazy manner (once a certain property is looked up).
+ * 
  * <p/>
  * The class can work in two modes:
  * <ol>
@@ -29,7 +39,9 @@ import javax.jcr.Session;
  * <strong>Note</strong> This class was inspired by JackRabbit's JcrConstants.
  * 
  * @author Costin Leau
- *
+ * @author Sergio Bossa
+ * @author Salvatore Incandela
+ * 
  */
 public class JcrConstants {
 
@@ -324,16 +336,18 @@ public class JcrConstants {
 	 * Cache for jcr items.
 	 */
 	protected final Map jcrCacheMap = new HashMap();
-	
+
 	/**
-	 * Cache for nt and mix items. (to avoid String classes and to balance the maps).
+	 * Cache for nt and mix items. (to avoid String classes and to balance the
+	 * maps).
 	 */
 	protected final Map ntCacheMap = new HashMap();
 
 	/**
 	 * Constructor.
 	 * 
-	 * @param cache true to cache resolved names, false otherwise.
+	 * @param cache
+	 *            true to cache resolved names, false otherwise.
 	 */
 	public JcrConstants(Session session, boolean cache) {
 		this.cache = cache;
@@ -352,23 +366,23 @@ public class JcrConstants {
 	 * @return
 	 */
 	protected String resolveName(String namespace, String property) {
-		// search cache 
+		// search cache
 		if (cache) {
 			Map map;
-			
+
 			// jcr namespace
 			if (JCR_NS.hashCode() == namespace.hashCode())
 				map = jcrCacheMap;
 			// mix and nt namespace
 			else
 				map = ntCacheMap;
-			
+
 			String result = (String) map.get(new Integer(property.hashCode()));
 			// cache miss
 			if (result == null)
 				result = computeName(namespace, property);
 			map.put(new Integer(property.hashCode()), result);
-			
+
 			return result;
 		}
 		// dynamic resolve
@@ -389,15 +403,14 @@ public class JcrConstants {
 			buffer.append(':');
 			buffer.append(property);
 			return buffer.toString();
-		}
-		catch (RepositoryException e) {
+		} catch (RepositoryException e) {
 			throw SessionFactoryUtils.translateException(e);
 		}
 	}
 
 	/**
 	 * Creates the actual cache.
-	 *
+	 * 
 	 */
 	protected void createCache() {
 		// String hashcode is used as key for fast look-ups.
@@ -406,88 +419,151 @@ public class JcrConstants {
 		// madness coming
 		//
 
-		// JCR 
-		jcrCacheMap.put(new Integer(JCR_AUTOCREATED.hashCode()), computeName(JCR_NS, JCR_AUTOCREATED));
-		jcrCacheMap.put(new Integer(JCR_BASEVERSION.hashCode()), computeName(JCR_NS, JCR_BASEVERSION));
-		jcrCacheMap.put(new Integer(JCR_CHILD.hashCode()), computeName(JCR_NS, JCR_CHILD));
-		jcrCacheMap.put(new Integer(JCR_CHILDNODEDEFINITION.hashCode()), computeName(JCR_NS,
-				JCR_CHILDNODEDEFINITION));
-		jcrCacheMap.put(new Integer(JCR_CONTENT.hashCode()), computeName(JCR_NS, JCR_CONTENT));
-		jcrCacheMap.put(new Integer(JCR_CREATED.hashCode()), computeName(JCR_NS, JCR_CREATED));
-		jcrCacheMap.put(new Integer(JCR_DATA.hashCode()), computeName(JCR_NS, JCR_DATA));
-		jcrCacheMap.put(new Integer(JCR_DEFAULTPRIMARYTYPE.hashCode()), computeName(JCR_NS,
-				JCR_DEFAULTPRIMARYTYPE));
-		jcrCacheMap.put(new Integer(JCR_DEFAULTVALUES.hashCode()), computeName(JCR_NS, JCR_DEFAULTVALUES));
-		jcrCacheMap.put(new Integer(JCR_ENCODING.hashCode()), computeName(JCR_NS, JCR_ENCODING));
-		jcrCacheMap.put(new Integer(JCR_FROZENMIXINTYPES.hashCode()), computeName(JCR_NS, JCR_FROZENMIXINTYPES));
-		jcrCacheMap.put(new Integer(JCR_FROZENNODE.hashCode()), computeName(JCR_NS, JCR_FROZENNODE));
+		// JCR
+		jcrCacheMap.put(new Integer(JCR_AUTOCREATED.hashCode()), computeName(
+				JCR_NS, JCR_AUTOCREATED));
+		jcrCacheMap.put(new Integer(JCR_BASEVERSION.hashCode()), computeName(
+				JCR_NS, JCR_BASEVERSION));
+		jcrCacheMap.put(new Integer(JCR_CHILD.hashCode()), computeName(JCR_NS,
+				JCR_CHILD));
+		jcrCacheMap.put(new Integer(JCR_CHILDNODEDEFINITION.hashCode()),
+				computeName(JCR_NS, JCR_CHILDNODEDEFINITION));
+		jcrCacheMap.put(new Integer(JCR_CONTENT.hashCode()), computeName(
+				JCR_NS, JCR_CONTENT));
+		jcrCacheMap.put(new Integer(JCR_CREATED.hashCode()), computeName(
+				JCR_NS, JCR_CREATED));
+		jcrCacheMap.put(new Integer(JCR_DATA.hashCode()), computeName(JCR_NS,
+				JCR_DATA));
+		jcrCacheMap.put(new Integer(JCR_DEFAULTPRIMARYTYPE.hashCode()),
+				computeName(JCR_NS, JCR_DEFAULTPRIMARYTYPE));
+		jcrCacheMap.put(new Integer(JCR_DEFAULTVALUES.hashCode()), computeName(
+				JCR_NS, JCR_DEFAULTVALUES));
+		jcrCacheMap.put(new Integer(JCR_ENCODING.hashCode()), computeName(
+				JCR_NS, JCR_ENCODING));
+		jcrCacheMap.put(new Integer(JCR_FROZENMIXINTYPES.hashCode()),
+				computeName(JCR_NS, JCR_FROZENMIXINTYPES));
+		jcrCacheMap.put(new Integer(JCR_FROZENNODE.hashCode()), computeName(
+				JCR_NS, JCR_FROZENNODE));
 		jcrCacheMap.put(new Integer(JCR_FROZENPRIMARYTYPE.hashCode()),
 				computeName(JCR_NS, JCR_FROZENPRIMARYTYPE));
-		jcrCacheMap.put(new Integer(JCR_FROZENUUID.hashCode()), computeName(JCR_NS, JCR_FROZENUUID));
-		jcrCacheMap.put(new Integer(JCR_HASORDERABLECHILDNODES.hashCode()), computeName(JCR_NS,
-				JCR_HASORDERABLECHILDNODES));
-		jcrCacheMap.put(new Integer(JCR_ISCHECKEDOUT.hashCode()), computeName(JCR_NS, JCR_ISCHECKEDOUT));
-		jcrCacheMap.put(new Integer(JCR_ISMIXIN.hashCode()), computeName(JCR_NS, JCR_ISMIXIN));
-		jcrCacheMap.put(new Integer(JCR_LANGUAGE.hashCode()), computeName(JCR_NS, JCR_LANGUAGE));
-		jcrCacheMap.put(new Integer(JCR_LASTMODIFIED.hashCode()), computeName(JCR_NS, JCR_LASTMODIFIED));
-		jcrCacheMap.put(new Integer(JCR_LOCKISDEEP.hashCode()), computeName(JCR_NS, JCR_LOCKISDEEP));
-		jcrCacheMap.put(new Integer(JCR_LOCKOWNER.hashCode()), computeName(JCR_NS, JCR_LOCKOWNER));
-		jcrCacheMap.put(new Integer(JCR_MANDATORY.hashCode()), computeName(JCR_NS, JCR_MANDATORY));
-		jcrCacheMap.put(new Integer(JCR_MERGEFAILED.hashCode()), computeName(JCR_NS, JCR_MERGEFAILED));
-		jcrCacheMap.put(new Integer(JCR_MIMETYPE.hashCode()), computeName(JCR_NS, JCR_MIMETYPE));
-		jcrCacheMap.put(new Integer(JCR_MIXINTYPES.hashCode()), computeName(JCR_NS, JCR_MIXINTYPES));
-		jcrCacheMap.put(new Integer(JCR_MULTIPLE.hashCode()), computeName(JCR_NS, JCR_MULTIPLE));
-		jcrCacheMap.put(new Integer(JCR_NAME.hashCode()), computeName(JCR_NS, JCR_NAME));
-		jcrCacheMap.put(new Integer(JCR_NODETYPENAME.hashCode()), computeName(JCR_NS, JCR_NODETYPENAME));
-		jcrCacheMap.put(new Integer(JCR_ONPARENTVERSION.hashCode()), computeName(JCR_NS, JCR_ONPARENTVERSION));
-		jcrCacheMap.put(new Integer(JCR_PATH.hashCode()), computeName(JCR_NS, JCR_PATH));
-		jcrCacheMap.put(new Integer(JCR_PREDECESSORS.hashCode()), computeName(JCR_NS, JCR_PREDECESSORS));
-		jcrCacheMap.put(new Integer(JCR_PRIMARYITEMNAME.hashCode()), computeName(JCR_NS, JCR_PRIMARYITEMNAME));
-		jcrCacheMap.put(new Integer(JCR_PRIMARYTYPE.hashCode()), computeName(JCR_NS, JCR_PRIMARYTYPE));
-		jcrCacheMap.put(new Integer(JCR_PRIMARYITEMNAME.hashCode()), computeName(JCR_NS, JCR_PRIMARYITEMNAME));
-		jcrCacheMap.put(new Integer(JCR_PROPERTYDEFINITION.hashCode()), computeName(JCR_NS,
-				JCR_PROPERTYDEFINITION));
-		jcrCacheMap.put(new Integer(JCR_PROTECTED.hashCode()), computeName(JCR_NS, JCR_PROTECTED));
-		jcrCacheMap.put(new Integer(JCR_REQUIREDPRIMARYTYPES.hashCode()), computeName(JCR_NS,
-				JCR_REQUIREDPRIMARYTYPES));
-		jcrCacheMap.put(new Integer(JCR_REQUIREDTYPE.hashCode()), computeName(JCR_NS, JCR_REQUIREDTYPE));
-		jcrCacheMap.put(new Integer(JCR_ROOTVERSION.hashCode()), computeName(JCR_NS, JCR_ROOTVERSION));
-		jcrCacheMap.put(new Integer(JCR_SAMENAMESIBLINGS.hashCode()), computeName(JCR_NS, JCR_SAMENAMESIBLINGS));
-		jcrCacheMap.put(new Integer(JCR_SCORE.hashCode()), computeName(JCR_NS, JCR_SCORE));
-		jcrCacheMap.put(new Integer(JCR_STATEMENT.hashCode()), computeName(JCR_NS, JCR_STATEMENT));
-		jcrCacheMap.put(new Integer(JCR_SUCCESSORS.hashCode()), computeName(JCR_NS, JCR_SUCCESSORS));
-		jcrCacheMap.put(new Integer(JCR_SUPERTYPES.hashCode()), computeName(JCR_NS, JCR_SUPERTYPES));
-		jcrCacheMap.put(new Integer(JCR_SYSTEM.hashCode()), computeName(JCR_NS, JCR_SYSTEM));
-		jcrCacheMap.put(new Integer(JCR_UUID.hashCode()), computeName(JCR_NS, JCR_UUID));
-		jcrCacheMap.put(new Integer(JCR_VALUECONSTRAINTS.hashCode()), computeName(JCR_NS, JCR_VALUECONSTRAINTS));
-		jcrCacheMap.put(new Integer(JCR_VERSIONABLEUUID.hashCode()), computeName(JCR_NS, JCR_VERSIONABLEUUID));
-		jcrCacheMap.put(new Integer(JCR_VERSIONHISTORY.hashCode()), computeName(JCR_NS, JCR_VERSIONHISTORY));
-		jcrCacheMap.put(new Integer(JCR_VERSIONLABELS.hashCode()), computeName(JCR_NS, JCR_VERSIONLABELS));
-		jcrCacheMap.put(new Integer(JCR_VERSIONSTORAGE.hashCode()), computeName(JCR_NS, JCR_VERSIONSTORAGE));
+		jcrCacheMap.put(new Integer(JCR_FROZENUUID.hashCode()), computeName(
+				JCR_NS, JCR_FROZENUUID));
+		jcrCacheMap.put(new Integer(JCR_HASORDERABLECHILDNODES.hashCode()),
+				computeName(JCR_NS, JCR_HASORDERABLECHILDNODES));
+		jcrCacheMap.put(new Integer(JCR_ISCHECKEDOUT.hashCode()), computeName(
+				JCR_NS, JCR_ISCHECKEDOUT));
+		jcrCacheMap.put(new Integer(JCR_ISMIXIN.hashCode()), computeName(
+				JCR_NS, JCR_ISMIXIN));
+		jcrCacheMap.put(new Integer(JCR_LANGUAGE.hashCode()), computeName(
+				JCR_NS, JCR_LANGUAGE));
+		jcrCacheMap.put(new Integer(JCR_LASTMODIFIED.hashCode()), computeName(
+				JCR_NS, JCR_LASTMODIFIED));
+		jcrCacheMap.put(new Integer(JCR_LOCKISDEEP.hashCode()), computeName(
+				JCR_NS, JCR_LOCKISDEEP));
+		jcrCacheMap.put(new Integer(JCR_LOCKOWNER.hashCode()), computeName(
+				JCR_NS, JCR_LOCKOWNER));
+		jcrCacheMap.put(new Integer(JCR_MANDATORY.hashCode()), computeName(
+				JCR_NS, JCR_MANDATORY));
+		jcrCacheMap.put(new Integer(JCR_MERGEFAILED.hashCode()), computeName(
+				JCR_NS, JCR_MERGEFAILED));
+		jcrCacheMap.put(new Integer(JCR_MIMETYPE.hashCode()), computeName(
+				JCR_NS, JCR_MIMETYPE));
+		jcrCacheMap.put(new Integer(JCR_MIXINTYPES.hashCode()), computeName(
+				JCR_NS, JCR_MIXINTYPES));
+		jcrCacheMap.put(new Integer(JCR_MULTIPLE.hashCode()), computeName(
+				JCR_NS, JCR_MULTIPLE));
+		jcrCacheMap.put(new Integer(JCR_NAME.hashCode()), computeName(JCR_NS,
+				JCR_NAME));
+		jcrCacheMap.put(new Integer(JCR_NODETYPENAME.hashCode()), computeName(
+				JCR_NS, JCR_NODETYPENAME));
+		jcrCacheMap.put(new Integer(JCR_ONPARENTVERSION.hashCode()),
+				computeName(JCR_NS, JCR_ONPARENTVERSION));
+		jcrCacheMap.put(new Integer(JCR_PATH.hashCode()), computeName(JCR_NS,
+				JCR_PATH));
+		jcrCacheMap.put(new Integer(JCR_PREDECESSORS.hashCode()), computeName(
+				JCR_NS, JCR_PREDECESSORS));
+		jcrCacheMap.put(new Integer(JCR_PRIMARYITEMNAME.hashCode()),
+				computeName(JCR_NS, JCR_PRIMARYITEMNAME));
+		jcrCacheMap.put(new Integer(JCR_PRIMARYTYPE.hashCode()), computeName(
+				JCR_NS, JCR_PRIMARYTYPE));
+		jcrCacheMap.put(new Integer(JCR_PRIMARYITEMNAME.hashCode()),
+				computeName(JCR_NS, JCR_PRIMARYITEMNAME));
+		jcrCacheMap.put(new Integer(JCR_PROPERTYDEFINITION.hashCode()),
+				computeName(JCR_NS, JCR_PROPERTYDEFINITION));
+		jcrCacheMap.put(new Integer(JCR_PROTECTED.hashCode()), computeName(
+				JCR_NS, JCR_PROTECTED));
+		jcrCacheMap.put(new Integer(JCR_REQUIREDPRIMARYTYPES.hashCode()),
+				computeName(JCR_NS, JCR_REQUIREDPRIMARYTYPES));
+		jcrCacheMap.put(new Integer(JCR_REQUIREDTYPE.hashCode()), computeName(
+				JCR_NS, JCR_REQUIREDTYPE));
+		jcrCacheMap.put(new Integer(JCR_ROOTVERSION.hashCode()), computeName(
+				JCR_NS, JCR_ROOTVERSION));
+		jcrCacheMap.put(new Integer(JCR_SAMENAMESIBLINGS.hashCode()),
+				computeName(JCR_NS, JCR_SAMENAMESIBLINGS));
+		jcrCacheMap.put(new Integer(JCR_SCORE.hashCode()), computeName(JCR_NS,
+				JCR_SCORE));
+		jcrCacheMap.put(new Integer(JCR_STATEMENT.hashCode()), computeName(
+				JCR_NS, JCR_STATEMENT));
+		jcrCacheMap.put(new Integer(JCR_SUCCESSORS.hashCode()), computeName(
+				JCR_NS, JCR_SUCCESSORS));
+		jcrCacheMap.put(new Integer(JCR_SUPERTYPES.hashCode()), computeName(
+				JCR_NS, JCR_SUPERTYPES));
+		jcrCacheMap.put(new Integer(JCR_SYSTEM.hashCode()), computeName(JCR_NS,
+				JCR_SYSTEM));
+		jcrCacheMap.put(new Integer(JCR_UUID.hashCode()), computeName(JCR_NS,
+				JCR_UUID));
+		jcrCacheMap.put(new Integer(JCR_VALUECONSTRAINTS.hashCode()),
+				computeName(JCR_NS, JCR_VALUECONSTRAINTS));
+		jcrCacheMap.put(new Integer(JCR_VERSIONABLEUUID.hashCode()),
+				computeName(JCR_NS, JCR_VERSIONABLEUUID));
+		jcrCacheMap.put(new Integer(JCR_VERSIONHISTORY.hashCode()),
+				computeName(JCR_NS, JCR_VERSIONHISTORY));
+		jcrCacheMap.put(new Integer(JCR_VERSIONLABELS.hashCode()), computeName(
+				JCR_NS, JCR_VERSIONLABELS));
+		jcrCacheMap.put(new Integer(JCR_VERSIONSTORAGE.hashCode()),
+				computeName(JCR_NS, JCR_VERSIONSTORAGE));
 
 		// MIX
-		jcrCacheMap.put(new Integer(MIX_LOCKABLE.hashCode()), computeName(MIX_NS, MIX_LOCKABLE));
-		jcrCacheMap.put(new Integer(MIX_REFERENCEABLE.hashCode()), computeName(MIX_NS, MIX_REFERENCEABLE));
-		jcrCacheMap.put(new Integer(MIX_VERSIONABLE.hashCode()), computeName(MIX_NS, MIX_VERSIONABLE));
+		jcrCacheMap.put(new Integer(MIX_LOCKABLE.hashCode()), computeName(
+				MIX_NS, MIX_LOCKABLE));
+		jcrCacheMap.put(new Integer(MIX_REFERENCEABLE.hashCode()), computeName(
+				MIX_NS, MIX_REFERENCEABLE));
+		jcrCacheMap.put(new Integer(MIX_VERSIONABLE.hashCode()), computeName(
+				MIX_NS, MIX_VERSIONABLE));
 
 		// NT
-		jcrCacheMap.put(new Integer(NT_BASE.hashCode()), computeName(NT_NS, NT_BASE));
-		jcrCacheMap.put(new Integer(NT_CHILDNODEDEFINITION.hashCode()), computeName(NT_NS,
-				NT_CHILDNODEDEFINITION));
-		jcrCacheMap.put(new Integer(NT_FILE.hashCode()), computeName(NT_NS, NT_FILE));
-		jcrCacheMap.put(new Integer(NT_FOLDER.hashCode()), computeName(NT_NS, NT_FOLDER));
-		jcrCacheMap.put(new Integer(NT_FROZENNODE.hashCode()), computeName(NT_NS, NT_FROZENNODE));
-		jcrCacheMap.put(new Integer(NT_HIERARCHYNODE.hashCode()), computeName(NT_NS, NT_HIERARCHYNODE));
-		jcrCacheMap.put(new Integer(NT_LINKEDFILE.hashCode()), computeName(NT_NS, NT_LINKEDFILE));
-		jcrCacheMap.put(new Integer(NT_NODETYPE.hashCode()), computeName(NT_NS, NT_NODETYPE));
-		jcrCacheMap.put(new Integer(NT_PROPERTYDEFINITION.hashCode()), computeName(NT_NS, NT_PROPERTYDEFINITION));
-		jcrCacheMap.put(new Integer(NT_QUERY.hashCode()), computeName(NT_NS, NT_QUERY));
-		jcrCacheMap.put(new Integer(NT_RESOURCE.hashCode()), computeName(NT_NS, NT_RESOURCE));
-		jcrCacheMap.put(new Integer(NT_UNSTRUCTURED.hashCode()), computeName(NT_NS, NT_UNSTRUCTURED));
-		jcrCacheMap.put(new Integer(NT_VERSION.hashCode()), computeName(NT_NS, NT_VERSION));
-		jcrCacheMap.put(new Integer(NT_VERSIONEDCHILD.hashCode()), computeName(NT_NS, NT_VERSIONEDCHILD));
-		jcrCacheMap.put(new Integer(NT_VERSIONHISTORY.hashCode()), computeName(NT_NS, NT_VERSIONHISTORY));
-		jcrCacheMap.put(new Integer(NT_VERSIONLABELS.hashCode()), computeName(NT_NS, NT_VERSIONLABELS));
+		jcrCacheMap.put(new Integer(NT_BASE.hashCode()), computeName(NT_NS,
+				NT_BASE));
+		jcrCacheMap.put(new Integer(NT_CHILDNODEDEFINITION.hashCode()),
+				computeName(NT_NS, NT_CHILDNODEDEFINITION));
+		jcrCacheMap.put(new Integer(NT_FILE.hashCode()), computeName(NT_NS,
+				NT_FILE));
+		jcrCacheMap.put(new Integer(NT_FOLDER.hashCode()), computeName(NT_NS,
+				NT_FOLDER));
+		jcrCacheMap.put(new Integer(NT_FROZENNODE.hashCode()), computeName(
+				NT_NS, NT_FROZENNODE));
+		jcrCacheMap.put(new Integer(NT_HIERARCHYNODE.hashCode()), computeName(
+				NT_NS, NT_HIERARCHYNODE));
+		jcrCacheMap.put(new Integer(NT_LINKEDFILE.hashCode()), computeName(
+				NT_NS, NT_LINKEDFILE));
+		jcrCacheMap.put(new Integer(NT_NODETYPE.hashCode()), computeName(NT_NS,
+				NT_NODETYPE));
+		jcrCacheMap.put(new Integer(NT_PROPERTYDEFINITION.hashCode()),
+				computeName(NT_NS, NT_PROPERTYDEFINITION));
+		jcrCacheMap.put(new Integer(NT_QUERY.hashCode()), computeName(NT_NS,
+				NT_QUERY));
+		jcrCacheMap.put(new Integer(NT_RESOURCE.hashCode()), computeName(NT_NS,
+				NT_RESOURCE));
+		jcrCacheMap.put(new Integer(NT_UNSTRUCTURED.hashCode()), computeName(
+				NT_NS, NT_UNSTRUCTURED));
+		jcrCacheMap.put(new Integer(NT_VERSION.hashCode()), computeName(NT_NS,
+				NT_VERSION));
+		jcrCacheMap.put(new Integer(NT_VERSIONEDCHILD.hashCode()), computeName(
+				NT_NS, NT_VERSIONEDCHILD));
+		jcrCacheMap.put(new Integer(NT_VERSIONHISTORY.hashCode()), computeName(
+				NT_NS, NT_VERSIONHISTORY));
+		jcrCacheMap.put(new Integer(NT_VERSIONLABELS.hashCode()), computeName(
+				NT_NS, NT_VERSIONLABELS));
 	}
 
 	public String getJCR_AUTOCREATED() {

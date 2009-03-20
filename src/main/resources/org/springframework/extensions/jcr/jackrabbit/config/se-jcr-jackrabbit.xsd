@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 
 <xsd:schema
-	xmlns="http://springmodules.dev.java.net/schema/jcr/jackrabbit"
+	xmlns="http://www.springsource.org/extensions/se-jcr/schema/jcr/jackrabbit"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:jcr="http://springmodules.dev.java.net/schema/jcr"
-	targetNamespace="http://springmodules.dev.java.net/schema/jcr/jackrabbit"
+	xmlns:jcr="http://www.springsource.org/extensions/se-jcr/schema/jcr"
+	targetNamespace="http://www.springsource.org/extensions/se-jcr/schema/jcr/jackrabbit"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 
-	<xsd:import namespace="http://springmodules.dev.java.net/schema/jcr"
-		schemaLocation="../../config/springmodules-jcr.xsd" />
+	<xsd:import namespace="http://www.springsource.org/extensions/se-jcr/schema/jcr"
+		schemaLocation="../../config/se-jcr.xsd" />
 
 	<xsd:element name="repository">
 		<xsd:complexType>

@@ -4,11 +4,11 @@
 
 <beans>
 	<bean id="jcrTransactionManager"
-		class="org.springmodules.jcr.jackrabbit.LocalTransactionManager">
+		class="org.springframework.extensions.jcr.jackrabbit.LocalTransactionManager">
 		<property name="sessionFactory" ref="jcrSessionFactory" />
 	</bean>
 
-	<bean id="jcrSessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+	<bean id="jcrSessionFactory" class="org.springframework.extensions.jcr.JcrSessionFactory">
 		<property name="repository" ref="repository"/>
 		<property name="credentials">
 			<bean class="javax.jcr.SimpleCredentials">
@@ -27,7 +27,7 @@
 		<constructor-arg index="0" value="pass"/>
 	</bean>
 	
-	<bean id="jcrTemplate" class="org.springmodules.jcr.JcrTemplate">
+	<bean id="jcrTemplate" class="org.springframework.extensions.jcr.JcrTemplate">
 		<property name="sessionFactory" ref="jcrSessionFactory"/>
 		<property name="allowCreate" value="true"/>
 	</bean>

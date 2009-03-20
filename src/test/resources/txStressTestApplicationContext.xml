@@ -3,12 +3,12 @@
     "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
-	<import resource="common-context.xml"/>
+	<import resource="commonApplicationContext.xml"/>
 	
 	<bean id="repository"
-		class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean">
+		class="org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean">
 		<!-- normal factory beans params -->
-		<property name="configuration" value="/org/springmodules/jcr/jackrabbit/jackrabbit-repo.xml" />
+		<property name="configuration" value="jackrabbitRepositoryConfiguration.xml" />
 		<!-- use the target folder which will be cleaned  -->
 		<property name="homeDir" value="file:./target/stress-repo" />
 	</bean>

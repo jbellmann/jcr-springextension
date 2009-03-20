@@ -1,8 +1,17 @@
 /**
- * Created on Sep 12, 2005
+ * Copyright 2009 the original author or authors
  *
- * $Id: JcrDaoSupportTests.java,v 1.3 2007/02/28 13:06:07 costin Exp $
- * $Revision: 1.3 $
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.support;
 
@@ -20,9 +29,11 @@ import org.springframework.extensions.jcr.SessionFactory;
 
 /**
  * @author Costin Leau
+ * @author Sergio Bossa
+ * @author Salvatore Incandela
  * 
  */
-public class JcrDaoSupportTests extends TestCase {
+public class JcrDaoSupportTest extends TestCase {
 
 	private MockControl sfCtrl, sessCtrl, repositoryCtrl;
 	private SessionFactory sf;
@@ -46,8 +57,7 @@ public class JcrDaoSupportTests extends TestCase {
 			sessCtrl.verify();
 			sfCtrl.verify();
 			repositoryCtrl.verify();
-		}
-		catch (IllegalStateException ex) {
+		} catch (IllegalStateException ex) {
 			// ignore: test method didn't call replay
 		}
 	}
@@ -55,10 +65,11 @@ public class JcrDaoSupportTests extends TestCase {
 	public void testJcrDaoSupportWithSessionFactory() throws Exception {
 
 		// used for ServiceProvider
-/*
-		sessCtrl.expectAndReturn(sess.getRepository(), repository, MockControl.ONE_OR_MORE);
-		sfCtrl.expectAndReturn(sf.getSession(), sess);
-*/		sfCtrl.replay();
+		/*
+		 * sessCtrl.expectAndReturn(sess.getRepository(), repository,
+		 * MockControl.ONE_OR_MORE); sfCtrl.expectAndReturn(sf.getSession(),
+		 * sess);
+		 */sfCtrl.replay();
 		sessCtrl.replay();
 
 		JcrDaoSupport dao = new JcrDaoSupport() {
@@ -69,7 +80,8 @@ public class JcrDaoSupportTests extends TestCase {
 		dao.setSessionFactory(sf);
 		dao.afterPropertiesSet();
 		assertEquals("Correct SessionFactory", sf, dao.getSessionFactory());
-		//assertEquals("Correct JcrTemplate", sf, dao.getJcrTemplate().getSessionFactory());
+		// assertEquals("Correct JcrTemplate", sf,
+		// dao.getJcrTemplate().getSessionFactory());
 		sfCtrl.verify();
 	}
 
@@ -93,15 +105,15 @@ public class JcrDaoSupportTests extends TestCase {
 		try {
 			dao.afterPropertiesSet();
 			fail("expected exception");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			//
 		}
 	}
 
 	public void testSetSessionFactory() throws RepositoryException {
-		//sessCtrl.expectAndReturn(sess.getRepository(), repository, MockControl.ONE_OR_MORE);
-		//sfCtrl.expectAndReturn(sf.getSession(), sess);
+		// sessCtrl.expectAndReturn(sess.getRepository(), repository,
+		// MockControl.ONE_OR_MORE);
+		// sfCtrl.expectAndReturn(sf.getSession(), sess);
 		sfCtrl.replay();
 		sessCtrl.replay();
 
@@ -109,7 +121,7 @@ public class JcrDaoSupportTests extends TestCase {
 		};
 
 		dao.setSessionFactory(sf);
-		
+
 		assertEquals(dao.getSessionFactory(), sf);
 	}
 
@@ -127,21 +139,20 @@ public class JcrDaoSupportTests extends TestCase {
 		try {
 			dao.getSession();
 			fail("expected exception");
-		}
-		catch (IllegalStateException e) {
-			// it's okay 
+		} catch (IllegalStateException e) {
+			// it's okay
 		}
 		assertEquals(dao.getSession(true), sess);
 	}
 
-	public void testReleaseSession(){
+	public void testReleaseSession() {
 		JcrDaoSupport dao = new JcrDaoSupport() {
 		};
 
 		dao.releaseSession(null);
 
 		sess.logout();
-		
+
 		sfCtrl.replay();
 		sessCtrl.replay();
 

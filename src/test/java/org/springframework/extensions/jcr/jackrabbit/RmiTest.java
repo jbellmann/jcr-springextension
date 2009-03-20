@@ -13,33 +13,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.springframework.extensions.jcr;
+package org.springframework.extensions.jcr.jackrabbit;
+
+import javax.jcr.Repository;
+
+import org.springframework.test.AbstractTransactionalSpringContextTests;
 
 /**
- * Interface used for delimiting Jcr operations based on what the underlying
- * repository supports (in this case optional operations).. Normally not used
- * but useful for casting to restrict access in some situations.
- * 
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
  * 
  */
-public interface JcrOptionalOperations extends JcrModel2Operations {
+public class RmiTest extends AbstractTransactionalSpringContextTests {
 
-	/**
-	 * @see javax.jcr.Session#addLockToken(java.lang.String)
-	 */
-	public void addLockToken(String lock);
+	protected String[] getConfigLocations() {
+		return new String[] { "jackrabbitRmiTestApplicationContext.xml" };
+	}
 
-	/**
-	 * @see javax.jcr.Session#getLockTokens()
-	 */
-	public String[] getLockTokens();
-
-	/**
-	 * @see javax.jcr.Session#removeLockToken(java.lang.String)
-	 */
-	public void removeLockToken(String lt);
+	public void testSetup() throws Exception {
+		Repository repository = (Repository) applicationContext
+				.getBean("rmiClient");
+		assertEquals("Jackrabbit", repository
+				.getDescriptor("jcr.repository.name"));
+	}
 
 }

@@ -1,8 +1,17 @@
 /**
- * Created on Sep 12, 2005
+ * Copyright 2009 the original author or authors
  *
- * $Id: OpenSessionInViewFilter.java,v 1.2 2006/03/07 13:09:30 costin Exp $
- * $Revision: 1.2 $
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.support;
 
@@ -22,29 +31,29 @@ import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionFactoryUtils;
 
 /**
- * Servlet 2.3 Filter that binds a JCR Session to the thread for the
- * entire processing of the request. Intended for the "Open Session
- * in View" pattern, i.e. to allow for lazy loading in web views despite the
- * original transactions already being completed.
+ * Servlet 2.3 Filter that binds a JCR Session to the thread for the entire
+ * processing of the request. Intended for the "Open Session in View" pattern,
+ * i.e. to allow for lazy loading in web views despite the original transactions
+ * already being completed.
  * 
  * <p>
  * This filter works similar to the AOP JcrInterceptor: It just makes JCR
- * Sessions available via the thread. It is suitable for
- * non-transactional execution but also for business layer transactions via
- * JcrTransactionManager or JtaTransactionManager. In the latter case,
- * Sessions pre-bound by this filter will automatically be used for
- * the transactions.
+ * Sessions available via the thread. It is suitable for non-transactional
+ * execution but also for business layer transactions via JcrTransactionManager
+ * or JtaTransactionManager. In the latter case, Sessions pre-bound by this
+ * filter will automatically be used for the transactions.
  * 
  * <p>
- * Looks up the SessionFactory in Spring's root web application
- * context. Supports a "SessionFactoryBeanName" filter init-param in
- * <code>web.xml</code>; the default bean name is
- * "SessionFactory". Looks up the SessionFactory on each
- * request, to avoid initialization order issues (when using
+ * Looks up the SessionFactory in Spring's root web application context.
+ * Supports a "SessionFactoryBeanName" filter init-param in <code>web.xml</code>
+ * ; the default bean name is "SessionFactory". Looks up the SessionFactory on
+ * each request, to avoid initialization order issues (when using
  * ContextLoaderServlet, the root application context will get initialized
  * <i>after</i> this filter).
  * 
  * @author Costin Leau
+ * @author Sergio Bossa
+ * @author Salvatore Incandela
  */
 public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	public static final String DEFAULT_JCR_SESSION_FACTORY_FACTORY_BEAN_NAME = "sessionFactory";
@@ -52,8 +61,8 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	private String SessionFactoryBeanName = DEFAULT_JCR_SESSION_FACTORY_FACTORY_BEAN_NAME;
 
 	/**
-	 * Set the bean name of the SessionFactory to fetch from Spring's
-	 * root application context. Default is "SessionFactory".
+	 * Set the bean name of the SessionFactory to fetch from Spring's root
+	 * application context. Default is "SessionFactory".
 	 * 
 	 * @see #DEFAULT_JCR_SESSION_FACTORY_FACTORY_BEAN_NAME
 	 */
@@ -62,19 +71,19 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * Return the bean name of the SessionFactory to fetch from
-	 * Spring's root application context.
+	 * Return the bean name of the SessionFactory to fetch from Spring's root
+	 * application context.
 	 */
 	protected String getSessionFactoryBeanName() {
 		return SessionFactoryBeanName;
 	}
 
-
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-			FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request,
+			HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 
 		SessionFactory sf = lookupSessionFactory(request);
-		
+
 		Session session = null;
 		boolean participate = false;
 
@@ -82,11 +91,11 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 			// Do not modify the Session: just set the participate
 			// flag.
 			participate = true;
-		}
-		else {
+		} else {
 			logger.debug("Opening JCR session in OpenSessionInViewFilter");
 			session = SessionFactoryUtils.getSession(sf, true);
-			TransactionSynchronizationManager.bindResource(sf, sf.getSessionHolder(session));
+			TransactionSynchronizationManager.bindResource(sf, sf
+					.getSessionHolder(session));
 		}
 
 		try {
@@ -103,11 +112,11 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * Look up the SessionFactory that this filter should use, taking
-	 * the current HTTP request as argument.
+	 * Look up the SessionFactory that this filter should use, taking the
+	 * current HTTP request as argument.
 	 * <p>
-	 * Default implementation delegates to the
-	 * <code>lookupSessionFactory</code> without arguments.
+	 * Default implementation delegates to the <code>lookupSessionFactory</code>
+	 * without arguments.
 	 * 
 	 * @return the SessionFactory to use
 	 * @see #lookupSessionFactory()
@@ -117,9 +126,9 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * Look up the SessionFactory that this filter should use. The
-	 * default implementation looks for a bean with the specified name in
-	 * Spring's root application context.
+	 * Look up the SessionFactory that this filter should use. The default
+	 * implementation looks for a bean with the specified name in Spring's root
+	 * application context.
 	 * 
 	 * @return the SessionFactory to use
 	 * @see #getSessionFactoryBeanName
@@ -130,8 +139,10 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 					+ getSessionFactoryBeanName()
 					+ "' for OpenSessionInViewFilter");
 		}
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		return (SessionFactory) wac.getBean(getSessionFactoryBeanName(), SessionFactory.class);
+		WebApplicationContext wac = WebApplicationContextUtils
+				.getRequiredWebApplicationContext(getServletContext());
+		return (SessionFactory) wac.getBean(getSessionFactoryBeanName(),
+				SessionFactory.class);
 	}
 
 }

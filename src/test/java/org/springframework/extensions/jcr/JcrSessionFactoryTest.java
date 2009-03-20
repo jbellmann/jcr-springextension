@@ -1,3 +1,18 @@
+/**
+ * Copyright 2009 the original author or authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package org.springframework.extensions.jcr;
 
 import org.springframework.extensions.jcr.EventListenerDefinition;
@@ -20,7 +35,7 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.springframework.extensions.jcr.support.ListSessionHolderProviderManager;
 
-public class JcrSessionFactoryTests extends TestCase {
+public class JcrSessionFactoryTest extends TestCase {
 
 	private JcrSessionFactory factory;
 
@@ -42,8 +57,7 @@ public class JcrSessionFactoryTests extends TestCase {
 
 		try {
 			repoCtrl.verify();
-		}
-		catch (IllegalStateException ex) {
+		} catch (IllegalStateException ex) {
 			// ignore: test method didn't call replay
 		}
 
@@ -53,29 +67,28 @@ public class JcrSessionFactoryTests extends TestCase {
 	}
 
 	/*
-	 * Test method for 'org.springmodules.jcr.JcrSessionFactory.getSession()'
+	 * Test method for
+	 * 'org.springframework.extensions.jcr.JcrSessionFactory.getSession()'
 	 */
 	public void testGetSession() {
 		try {
 			repoCtrl.expectAndReturn(repo.login(null, null), null);
 			factory.getSession();
-		}
-		catch (RepositoryException e) {
+		} catch (RepositoryException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/*
 	 * Test method for
-	 * 'org.springmodules.jcr.JcrSessionFactory.afterPropertiesSet'
+	 * 'org.springframework.extensions.jcr.JcrSessionFactory.afterPropertiesSet'
 	 */
 	public void testAfterPropertiesSet() throws Exception {
 		try {
 			factory.setRepository(null);
 			factory.afterPropertiesSet();
 			fail("expected exception (session factory badly initialized");
-		}
-		catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 		}
 	}
 
@@ -112,7 +125,8 @@ public class JcrSessionFactoryTests extends TestCase {
 		EventListenerDefinition def1 = new EventListenerDefinition();
 		EventListenerDefinition def2 = new EventListenerDefinition();
 
-		EventListenerDefinition listeners[] = new EventListenerDefinition[] { def1, def2 };
+		EventListenerDefinition listeners[] = new EventListenerDefinition[] {
+				def1, def2 };
 		factory.setEventListeners(listeners);
 
 		MockControl sessionCtrl = MockControl.createControl(Session.class);
@@ -121,7 +135,8 @@ public class JcrSessionFactoryTests extends TestCase {
 		MockControl wsCtrl = MockControl.createControl(Workspace.class);
 		Workspace ws = (Workspace) wsCtrl.getMock();
 
-		MockControl omCtrl = MockControl.createControl(ObservationManager.class);
+		MockControl omCtrl = MockControl
+				.createControl(ObservationManager.class);
 		ObservationManager oManager = (ObservationManager) omCtrl.getMock();
 
 		repoCtrl.expectAndReturn(repo.login(null, null), session);
@@ -129,10 +144,12 @@ public class JcrSessionFactoryTests extends TestCase {
 
 		wsCtrl.expectAndReturn(ws.getObservationManager(), oManager);
 
-		oManager.addEventListener(def1.getListener(), def1.getEventTypes(), def1.getAbsPath(), def1.isDeep(), def1
-				.getUuid(), def1.getNodeTypeName(), def1.isNoLocal());
-		oManager.addEventListener(def2.getListener(), def2.getEventTypes(), def2.getAbsPath(), def2.isDeep(), def2
-				.getUuid(), def2.getNodeTypeName(), def2.isNoLocal());
+		oManager.addEventListener(def1.getListener(), def1.getEventTypes(),
+				def1.getAbsPath(), def1.isDeep(), def1.getUuid(), def1
+						.getNodeTypeName(), def1.isNoLocal());
+		oManager.addEventListener(def2.getListener(), def2.getEventTypes(),
+				def2.getAbsPath(), def2.isDeep(), def2.getUuid(), def2
+						.getNodeTypeName(), def2.isNoLocal());
 
 		repoCtrl.replay();
 		sessionCtrl.replay();
@@ -170,7 +187,7 @@ public class JcrSessionFactoryTests extends TestCase {
 		repoCtrl.expectAndReturn(repo.login(null, null), session);
 		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
 		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
-		
+
 		nrCtrl.expectAndReturn(registry.getPrefixes(), new String[0]);
 
 		// destroy
@@ -336,13 +353,15 @@ public class JcrSessionFactoryTests extends TestCase {
 		SessionHolder holder = factory.getSessionHolder(session);
 		assertSame(SessionHolder.class, holder.getClass());
 		// default session holder provider
-		assertSame(SessionHolder.class, factory.getSessionHolder(null).getClass());
+		assertSame(SessionHolder.class, factory.getSessionHolder(null)
+				.getClass());
 	}
 
 	public void testSessionHolder() throws Exception {
 		final String REPO_NAME = "hocus_pocus";
 
-		repoCtrl.expectAndReturn(repo.getDescriptor(Repository.REP_NAME_DESC), REPO_NAME);
+		repoCtrl.expectAndReturn(repo.getDescriptor(Repository.REP_NAME_DESC),
+				REPO_NAME);
 
 		MockControl sessionCtrl = MockControl.createControl(Session.class);
 		Session session = (Session) sessionCtrl.getMock();
@@ -357,14 +376,14 @@ public class JcrSessionFactoryTests extends TestCase {
 		providers.add(new SessionHolderProvider() {
 
 			/**
-			 * @see org.springmodules.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
+			 * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
 			 */
 			public boolean acceptsRepository(String repositoryName) {
 				return REPO_NAME.equals(repositoryName);
 			}
 
 			/**
-			 * @see org.springmodules.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
+			 * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
 			 */
 			public SessionHolder createSessionHolder(Session session) {
 				return new CustomSessionHolder(session);
@@ -380,7 +399,8 @@ public class JcrSessionFactoryTests extends TestCase {
 
 		Session sess = factory.getSession();
 		assertSame(session, sess);
-		assertSame(CustomSessionHolder.class, factory.getSessionHolder(sess).getClass());
+		assertSame(CustomSessionHolder.class, factory.getSessionHolder(sess)
+				.getClass());
 
 		repoCtrl.verify();
 		sessionCtrl.verify();
@@ -390,6 +410,8 @@ public class JcrSessionFactoryTests extends TestCase {
 	 * Used for testing.
 	 * 
 	 * @author Costin Leau
+	 * @author Sergio Bossa
+	 * @author Salvatore Incandela
 	 * 
 	 */
 	private class CustomSessionHolder extends SessionHolder {
