@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project>
+    <body>
+        <menu name="Se-Jcr">
+            <item name="Documentation" href="/index.html">
+                <item name="Official Documentation" href="/guide.html"/>
+            </item>
+        </menu>
+    </body>
+</project>

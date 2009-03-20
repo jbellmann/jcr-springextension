@@ -1,0 +1,508 @@
+JSR standard support
+
+    The standard support works only with the JSR-170 API (represented
+    by <<< javax.jcr>>> package) without making any use of
+    specific features of the implementations (which we will discuss
+    later).
+
+*SessionFactory
+
+    JSR-170 doesn't provide a notion of
+    <<<SessionFactory>>> but rather a repository which based on
+    the credentials and workspace provided returnes a session. The
+    <<<SessionFactory>>> interface describes a basic contract
+    for retrieving session without any knowledge of credentials, it's
+    implementation acting as a wrapper around the
+    <<<javax.jcr.Repository>>>:
+
+
++------+
+<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+  <property name="repository" ref="repository"/>
+</bean>
++------+
+
+    The only requirement for creating a
+    sessionFactory is the repository (which will be discussed later). There
+    are cases were credentials have to be submitted. One problem that new
+    users have is that
+    <<<javax.jcr.SimpleCredentials>>>
+    requires a char array (char[]) as constructor parameter and not a String
+    and the current Spring distribution (1.2.5) does not contains a
+    <<<PropertyEditor>>> for char arrays. The following
+    examples (taken from the sample) shows how we can use String statical
+    methods to obtain a char array:
+
++------+
+<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+  <property name="repository" ref="repository"/>
+  <property name="credentials">
+   <bean class="javax.jcr.SimpleCredentials">
+    <constructor-arg index="0" value="bogus"/>
+    <constructor-arg index="1">
+     <bean factory-bean="password" factory-method="toCharArray"/>
+    </constructor-arg>
+   </bean>
+  </property>
+</bean>
+
+<bean id="password" class="java.lang.String">
+  <constructor-arg index="0" value="pass"/>
+</bean>
++------+
+
+    Using the static
+    <<<toCharArray>>>
+    (from
+    <<<java.lang.String>>>) we transformed the String
+    supplied as password (with value 'pass') to
+    <<<SimpleCredentials>>> for user 'bogus'. Note that
+    <<<JcrSessionFactory>>> can also register namespaces, add
+    listeners and has utility methods for determing the underlying
+    repository properties - see the javadoc and the samples for more
+    information.
+
+*Namespace registration
+
+    The
+    <<<JcrSessionFactory>>> allows namespace
+    registration based on the standard JSR-170 API. It is possible to
+    override the existing namespaces (if any) and register namespaces just
+    during the existence of the
+    <<<JcrSessionFactory>>>. By
+    default, the given namespaces are registered only if they occupy free
+    prefixes and be kept in the repository even after the
+    <<<SessionFactory>>> shuts down.
+
+    To register the namespaces, simply pass them as a property
+    object, with the key representing the prefix and the value,
+    representing the namespace:
+
++------+
+<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+  ...
+ <property name="namespaces">
+  <props>
+    <prop key="foo">http://bar.com/jcr</prop>
+    <prop key="hocus">http://pocus.com/jcr</prop>
+   </props>
+ </property>
+</bean>
++------+
+
+    One can customize the behavior of the
+    <<<JcrSessionFactory>>> using 3 flags:
+
+        *
+        <forceNamespacesRegistration> - indicates
+        if namespaces already registered under the given prefixes will be
+        overridden or not(default). If
+        <<<true>>>, the
+        existing namespaces will be unregistered before registering the
+        new ones. Note however that most (if not all) JCR implementations
+        do not support namespace registration.
+
+        *
+        <keepNewNamespaces> - indicates if the
+        given namespaces are kept, after being registered (default) or
+        unregistered on the
+        <<<SessionFactory>>> destruction.
+        If
+        <<<true>>>, the namespaces unregistered during the
+        registration process will be registered back on the repository.
+        Again, as noted above, this requires the JCR implementation to
+        support namespace un-registration.
+
+        *
+        <skipExistingNamespaces> - indicates if
+        the during the registration process, the existing namespaces are
+        being skipped (default) or not. This flag is used as a workaround
+        for repositories that don't support namespace un-registration
+        (which render the
+        <forceNamespacesRegistration>
+        and
+        <keepNewNamespaces> useless). If
+        <<<true>>>, will allow registration of new namespaces
+        only if they use a free prefix; if the prefix is taken, the
+        namespace registration is skipped.
+
+*Event Listeners
+
+    JSR-170 repositories which support
+    <Observation>, allow the developer to monitor
+    various event types inside a workspace. However, any potential
+    listener has to be register per-session basis which makes the session
+    creation difficult.
+    <<<JcrSessionFactory>>> eases the
+    process by supporting global (across all sessions) listeners through
+    its
+    <<<EventListenerDefinition>>>, a simple wrapper class
+    which associates a JCR
+    <<<EventListener>>> with event
+    types, node paths and uuids (which allows, if desired, the same
+    <<<EventListener>>> instance to be reused across the
+    sessions and event types).
+
+    Configuring the listener is straight forward:
+
++------+
+<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+  ...
+  <property name="eventListeners">
+   <list>
+    <bean class="org.springmodules.jcr.EventListenerDefinition">
+     <property name="listener">
+      <bean class="org.springmodules.examples.jcr.DummyEventListener"/>
+     </property>
+     <property name="absPath" value="/rootNode/someFolder/someLeaf"/>
+    </bean>
+   </list>
+  </property>
+</property>
++------+
+
+*NodeTypeDefinition registration
+
+    JCR 1.0 specifications allows custom node types to be registered
+    in a repository but it doesn't standardises the process, thus each JCR
+    implementation comes with its own approach. For Jackrabbit, the JCR
+    module provides a dedicated
+    <<<SessionFactory>>>, the
+    <<<JackrabbitSessionFactory>>> which allows node type
+    definitions in the
+    {{{http://jackrabbit.apache.org/doc/nodetype/cnd.html}CND
+    }}
+    format, to be added to the repository:
+
++------+
+<bean id="jackrabbitSessionFactory" class="org.springmodules.jcr.jackrabbit.JackrabbitSessionFactory">
+  ...
+  <property name="nodeDefinitions">
+    <list>
+     <value>classpath:/nodeTypes/wikiTypes.cnd</value>
+     <value>classpath:/nodeTypes/clientATypes.cnd</value>
+    </list>
+  </property>
+</bean>
++------+
+
+    If there is no need to register any custom node types, it's
+    recommended that the
+    <<<JcrSessionFactory>>> is used
+    since it works on all JCR repositories.
+
+*Inversion of Control: JcrTemplate and JcrCallback
+
+    Most of the work with the JCR will be made through the
+    <<<JcrTemplate>>> itself or through a
+    <<<JcrCallback>>>. The template requires a
+    <<<SessionFactory>>> and can be configured to create
+    sessions on demand or reuse them (thread-bound) - the default
+    behavior.
+
++------+
+<bean id="jcrTemplate" class="org.springmodules.jcr.JcrTemplate">
+  <property name="sessionFactory" ref="sessionFactory"/>
+  <property name="allowCreate" value="true"/>
+</bean>
++------+
+
+    <<<JcrTemplate>>> contains many of
+    the operations defined in
+    <<<javax.jcr.Session>>> and
+    <<<javax.jcr.query.Query>>> classes plus some convenient
+    ones; however there are cases when they are not enought. With
+    <<<JcrCallback>>>, one can work directly with the
+    <<<Session>>>, the callback begin thread-safe, opens/closes
+    sessions and deals with exceptions:
+
++------+
+public void saveSmth() {
+    template.execute(new JcrCallback() {
+
+        public Object doInJcr(Session session) throws RepositoryException {
+            Node root = session.getRootNode();
+            log.info("starting from root node " \+ root);
+            Node sample = root.addNode("sample node");
+            sample.setProperty("sample property", "bla bla");
+            log.info("saved property " \+ sample);
+            session.save();
+            return null;
+        }
+    });
+}
++------+
+
+*Implementing Spring-based DAOs without callbacks
+
+    The developer can access the repository in a more 'traditional'
+    way without using
+    <<<JcrTemplate>>> (and
+    <<<JcrCallback>>>) but still use Spring DAO exception
+    hierarchy. SpringModules
+    <<<JcrDaoSupport>>> offers base
+    methods for retrieving
+    <<<Session>>> from the
+    <<<SessionFactory>>> (in a transaction-aware manner is
+    transactions are supported) and for converting exceptions (which use
+    <<<SessionFactoryUtils>>> static methods). Note that such
+    code will usually pass "false" into
+    <<<getSession>>>'s
+    the "allowCreate" flag, to enforce running within a transaction (which
+    avoids the need to close the returned
+    <<<Session>>>, as
+    it its lifecycle is managed by the transaction):
+
++------+
+public class ProductDaoImpl extends JcrDaoSupport {
+
+    public void saveSmth()
+            throws DataAccessException, MyException {
+
+        Session session = getSession();
+        try {
+                Node root = session.getRootNode();
+                log.info("starting from root node " + root);
+                Node sample = root.addNode("sample node");
+                sample.setProperty("sample property", "bla bla");
+                log.info("saved property " + sample);
+                session.save();
+                return null;
+        }
+        catch (RepositoryException ex) {
+            throw convertJcrAccessException(ex);
+        }
+    }
+}
++------+
+
+    The major advantage of such direct JCR access code is that
+    it allows any checked application exception to be thrown within the
+    data access code, while
+    <<<JcrTemplate>>> is restricted
+    to unchecked exceptions within the callback. Note that one can often
+    defer the corresponding checks and the throwing of application
+    exceptions to after the callback, which still allows working with
+    <<<JcrTemplate>>>. In general,
+    <<<JcrTemplate's>>> convenience methods are simpler and
+    more convenient for many scenarios.
+
+*RepositoryFactoryBean
+
+    Repository configuration have not been discussed by JSR-170 and
+    every implementation has a different approach. The JCR-support provides
+    an abstract repository factory bean which defined the main functionality
+    leaving subclasses to deal only with the configuration issues. The
+    current version supports jackrabbit and jeceira as repository
+    implementations but adding new ones is very easy. Note that through
+    Spring, one can configure a repository without the mentioned
+    <<<RepositoryFactoryBean>>>.
+
+*Jackrabbit
+
+    {{{http://incubator.apache.org/jackrabbit/}JackRabbit
+    }} is
+    the default implementation of the JSR-170 and it's part of the Apache
+    Foundation. The project has graduated from the incubator and had an
+    initial 1.0 release in early 2006. JackRabbit support both levels and
+    all the optional features described in the specifications.
+
++------+
+<!-- configuring the default repository -->
+<bean id="repository" class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean">
+  <!-- normal factory beans params -->
+  <property name="configuration" value="classpath:jackrabbit-repo.xml"/>
+  <property name="homeDir" value="/repo"/>
+</bean>
++------+
+
+    Or:
+
++------+
+<!-- configuring a 'transient' repository (automatically starts when a session is opened
+     and shutdowns when all sessions are closed) -->
+<bean id="repository" class="org.springmodules.jcr.jackrabbit.TransientRepositoryFactoryBean">
+  <!-- normal factory beans params -->
+  <property name="configuration" value="classpath:jackrabbit-repo.xml"/>
+  <property name="homeDir" value="/repo"/>
+</bean>
++------+
+
+    Note that
+    <<<RepositoryFactoryBean>>> makes use of
+    Spring Resource to find the configuration file.
+
+*Jackrabbit RMI support
+
+    Jackrabbit's RMI server/client setup is provided through
+    <<<org.springmodules.jcr.jackrabbit.RmiServerRepositoryFactoryBean>>>
+    though Spring itself can handle most of the configuration without any
+    special support:
+
++------+
+<!-- normal repository -->
+<bean id="repository" class="org.springmodules.jcr.jackrabbit.RepositoryFactoryBean">
+   <!-- normal factory beans params -->
+   <property name="configuration" value="/org/springmodules/jcr/jackrabbit/jackrabbit-repo.xml" />
+   <!-- use the target folder which will be cleaned  -->
+   <property name="homeDir" value="file:./target/repo" />
+</bean>
+
+<!-- rmi server -->
+
+<!-- use Spring's RMI classes to retrieve the RMI registry -->
+<bean id="rmiRegistry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean"/>
+
+<bean id="rmiServer" class="org.springmodules.jcr.jackrabbit.RmiServerRepositoryFactoryBean">
+  <property name="repository" ref="repository"/>
+  <property name="remoteAdapterFactory">
+    <bean class="org.apache.jackrabbit.rmi.server.ServerAdapterFactory"/>
+  </property>
+
+  <property name="registry" ref="rmiRegistry"/>
+  <property name="rmiName" value="jackrabbit"/>
+</bean>
+
+<!-- rmi client -->
+<bean id="rmiClientFactory" class="org.apache.jackrabbit.rmi.client.ClientRepositoryFactory"/>
+
+<bean id="rmiClient" factory-bean="rmiClientFactory" factory-method="getRepository"
+                   depends-on="rmiServer">
+  <constructor-arg value="rmi://localhost:1099/jackrabbit"/>
+</bean>
++------+
+
+Extensions support
+
+    JSR-170 defines 2 levels of complaince and a number of optional
+    features which can be provided by implementations, transactions being one
+    of them.
+
+*Transaction Manager
+
+    One of the nicest features of the JCR support in Spring Modules is
+    transaction management (find out more about Spring transaction
+    management in
+    {{{http://static.springframework.org/spring/docs/1.2.x/reference/transaction.html}Chapter
+    8
+    }} of the Spring official reference documentation). At the
+    moment, only Jackrabbit is known to have dedicated transactional
+    capabilities. One can use
+    <<<LocalTransactionManager>>> for
+    local transactions or Jackrabbit's JCA connector to enlist the
+    repository in a XA transaction through a JTA transaction manager. As a
+    side note the JCA scenario can be used within an application server
+    along with a specific descriptor or using a portable JCA connector (like
+    {{{http://www.jencks.org}Jencks}}) which can work
+    outside or inside an application server.
+
+**LocalTransactionManager
+
+    For local transaction the
+    <<<LocalTransactionManager>>> should be
+    used:
+
++------+
+<bean id="jcrTransactionManager"
+ class="org.springmodules.jcr.jackrabbit.LocalTransactionManager">
+   <property name="sessionFactory" ref="jcrSessionFactory"/>
+</bean>
+
+<!-- transaction proxy for Jcr services/facades -->
+<bean id="txProxyTemplate" abstract="true"
+    class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+ <property name="proxyTargetClass" value="true"/>
+ <property name="transactionManager" ref="jcrTransactionManager"/>
+ <property name="transactionAttributes">
+   <props>
+      <prop key="save\*">PROPAGATION_REQUIRED</prop>
+      <prop key="\*">PROPAGATION_REQUIRED, readOnly</prop>
+   </props>
+ </property>
+</bean>
+
+<bean id="jcrService" parent="txProxyTemplate">
+ <property name="target">
+  <bean class="org.springmodules.examples.jcr.JcrService">
+   <property name="template" ref="jcrTemplate"/>
+  </bean>
+ </property>
+</bean>
++------+
+
+    for which only the
+    <<<sessionFactory>>> is required.
+
+    Note that when using transactions in most cases you want to
+    reuse the session (which means
+    <<<allowCreate>>> property
+    on
+    <<<jcrTemplate>>> should be false (default)).
+
+**JTA transactions
+
+    For distributed transactions, using JCA is recommend in
+    JackRabbit's case. An example is found inside the sample. You are free
+    to use your application server JCA support; Jencks is used only for
+    demonstrative purpose, the code inside the jackrabbit support having
+    no dependency on it.
+
+*SessionHolderProviderManager and SessionHolderProvider
+
+    Because JSR-170 doesn't directly address transaction, details
+    vary from repository to repository; JCR module contains (quite a lot
+    of) classes to make this issue as painless as possible. Normally users
+    should not be concern with these classes,however they are the main
+    point for adding support for custom implementations.
+
+    In order to plug in extra capabilities one must supply a
+    <<<SessionHolderProvider>>> implementation which can take
+    advantage of the underlying JCR session feature.
+    <<<SessionHolderProviderManager>>> acts as a registry of
+    <<<SessionHolderProvider>>>s for different repositories
+    and has several implementations that return user defined provider or
+    discover them automatically.
+
+    <<<By default,
+    ServiceSessionHolderProviderManager
+    >>> is used, which is
+    suitable for most of cases. It uses
+    {{{http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider}JDK
+    1.3\+ Service Provider specification
+    }} (also known as
+    <META-INF/services>) for determining the holder
+    provider. The class looks on the classpath under META-INF/services for
+    the file named
+    "
+    <<<org.springmodules.jcr.SessionHolderProvider>>>"
+    (which contains the fully qualified name of a
+    <<<SessionHolderProvider>>> implementation). The
+    providers found are instantiated and registered and later on used for
+    the repository they support. The distribution for example, contains
+    such a file to leverage Jackrabbit's transactional
+    capabilities.
+
+    Besides
+    <<<ServiceSessionHolderProviderManager>>>,
+    one can use
+    <<<ListSessionHolderProviderManager>>> to
+    manually associate a
+    <<<SessionHolder>>> with a certain
+    repository:
+
++------+
+<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
+  <property name="repository" ref="repository"/>
+  <property name="credentials">
+  ...
+  </property>
+  <property name="sessionHolderProviderManager">
+    <bean class="org.springmodules.jcr.support.ListSessionHolderProviderManager">
+     <list>
+      <bean class="foo.bar.CustomSessionHolderProvider"/>
+      <bean class="my.custom.AnotherSessionHolderProvider"/>
+     </list>
+    </bean>
+  </property>
+</bean>
++------+

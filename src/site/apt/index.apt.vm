@@ -1,0 +1,21 @@
+Spring Extension for Java Content Repository (JSR-170)
+
+    JSR-170 defines "a standard, implementation independent, way to
+    access content bi-directionally on a granular level within a content
+    repository. A Content Repository is a high-level information management
+    system that is a superset of traditional data repositories. A content
+    repository implements "content services" such as: author based versioning,
+    full textual searching, fine grained access control, content
+    categorization and content event monitoring. It is these "content
+    services" that differentiate a Content Repository from a Data Repository."
+    (taken from the JSR-170 description page).
+
+    The Spring JCR Extension (se-jcr) has been designed to resemble as much as possible the
+    ORM packages from the main Spring distribution. Users familiar with these
+    can start using the JCR-support right away without much hassle.
+    As the ORM package, the main reason
+    for the JCR support is to ease development using Spring unchecked
+    DAOexception hierarchy, integrated transaction management and ease of
+    testing.
+
+    So take a look at the {{{guide.html}se-jcr guide}} and enjoy!
