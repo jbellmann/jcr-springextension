@@ -17,6 +17,7 @@ package org.springframework.extensions.jcr.config;
 
 import junit.framework.TestCase;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -32,22 +33,23 @@ public class JcrNamespaceHandlerTest extends TestCase {
 				"jcrNamespaceHandlerTest.xml"));
 	}
 
-	private void assertPropertyValue(RootBeanDefinition beanDefinition,
+	private void assertPropertyValue(BeanDefinition beanDefinition,
 			String propertyName, Object expectedValue) {
 		assertEquals("Property [" + propertyName + "] incorrect.",
 				expectedValue, getPropertyValue(beanDefinition, propertyName));
 	}
 
-	private Object getPropertyValue(RootBeanDefinition beanDefinition,
+	private Object getPropertyValue(BeanDefinition beanDefinition,
 			String propertyName) {
 		return beanDefinition.getPropertyValues()
 				.getPropertyValue(propertyName).getValue();
 	}
 
 	public void testEventListenerDefinition() throws Exception {
-		RootBeanDefinition beanDefinition = (RootBeanDefinition) this.beanFactory
+		BeanDefinition beanDefinition = this.beanFactory
 				.getBeanDefinition("eventListenerFull");
-		assertSame(EventListenerDefinition.class, beanDefinition.getBeanClass());
+		assertSame(EventListenerDefinition.class.getName(), beanDefinition
+				.getBeanClassName());
 		assertPropertyValue(beanDefinition, "absPath", "/somePath");
 		assertPropertyValue(beanDefinition, "isDeep", "true");
 		assertPropertyValue(beanDefinition, "noLocal", "false");
@@ -59,9 +61,10 @@ public class JcrNamespaceHandlerTest extends TestCase {
 	}
 
 	public void testSessionFactory() throws Exception {
-		RootBeanDefinition beanDefinition = (RootBeanDefinition) this.beanFactory
+		BeanDefinition beanDefinition = this.beanFactory
 				.getBeanDefinition("sessionFactory");
-		assertSame(JcrSessionFactory.class, beanDefinition.getBeanClass());
+		assertSame(JcrSessionFactory.class.getName(), beanDefinition
+				.getBeanClassName());
 
 	}
 }
