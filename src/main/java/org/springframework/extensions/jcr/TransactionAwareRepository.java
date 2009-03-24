@@ -59,7 +59,7 @@ import org.springframework.util.ObjectUtils;
  * will work without any Spring API dependencies in the DAO code!
  * 
  * <p/>
- * It is usually preferable to write your JCR-based DAOs with Spring Modules's
+ * It is usually preferable to write your JCR-based DAOs with Spring Extensions's
  * JcrTemplate, offering benefits such as consistent data access exceptions
  * instead of RepositoryExceptions at the DAO layer. However, Spring's resource
  * and transaction management (and Dependency Injection) will work for DAOs

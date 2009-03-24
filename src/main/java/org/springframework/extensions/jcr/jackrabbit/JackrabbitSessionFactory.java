@@ -27,11 +27,11 @@ import org.springframework.extensions.jcr.JcrSessionFactory;
 
 /**
  * Jackrabbit specific {@link JcrSessionFactory} which allows registration of
- * node types in <a
- * href="http://jackrabbit.apache.org/doc/nodetype/cnd.html">CND</a> format.
+ * node types in <a href="http://jackrabbit.apache.org/node-types.html">Content
+ * node types</a> format.
  * 
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
  * 
  */
