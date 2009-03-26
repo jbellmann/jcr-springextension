@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
-    "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+http://www.springframework.org/schema/util 
+http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-<beans>
-	<import resource="commonApplicationContext.xml"/>
-	
+	<import resource="commonApplicationContext.xml" />
+
 	<bean id="repository"
 		class="org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean">
 		<!-- normal factory beans params -->
 		<property name="configuration" value="jackrabbitRepositoryConfiguration.xml" />
 		<!-- use the target folder which will be cleaned  -->
-		<property name="homeDir" value="file:./target/stress-repo" />
+		<property name="homeDir" value="file:./target/tmp/stress-repo" />
 	</bean>
 </beans>

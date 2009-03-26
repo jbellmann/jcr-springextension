@@ -20,122 +20,111 @@ import javax.jcr.Repository;
 import org.apache.jackrabbit.api.JackrabbitRepository;
 import org.apache.jackrabbit.core.RepositoryImpl;
 import org.apache.jackrabbit.core.config.RepositoryConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.xml.sax.InputSource;
 
 /**
- * FactoryBean for creating a JackRabbit (JCR-170) repository through Spring
- * configuration files. Use this factory bean when you have to manually
- * configure the repository; for retrieving the repository from JNDI use the
- * JndiObjectFactoryBean {@link org.springframework.jndi.JndiObjectFactoryBean}
- * 
- * 
+ * FactoryBean for creating a JackRabbit (JCR-170) repository through Spring configuration files. Use this
+ * factory bean when you have to manually configure the repository; for retrieving the repository from JNDI
+ * use the JndiObjectFactoryBean {@link org.springframework.jndi.JndiObjectFactoryBean}
  * @see org.springframework.jndi.JndiObjectFactoryBean
- * 
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
-public class RepositoryFactoryBean extends
-		org.springframework.extensions.jcr.RepositoryFactoryBean {
+public class RepositoryFactoryBean extends org.springframework.extensions.jcr.RepositoryFactoryBean {
 
-	/**
-	 * Default repository configuration file.
-	 */
-	private static final String DEFAULT_CONF_FILE = "repository.xml";
+    private static final Logger LOG = LoggerFactory.getLogger(RepositoryFactoryBean.class);
 
-	/**
-	 * Default repository directory.
-	 */
-	private static final String DEFAULT_REP_DIR = ".";
+    /**
+     * Default repository configuration file.
+     */
+    private static final String DEFAULT_CONF_FILE = "repository.xml";
 
-	/**
-	 * Home directory for the repository.
-	 */
-	private Resource homeDir;
+    /**
+     * Default repository directory.
+     */
+    private static final String DEFAULT_REP_DIR = ".";
 
-	/**
-	 * Repository configuratin created through Spring.
-	 */
-	private RepositoryConfig repositoryConfig;
+    /**
+     * Home directory for the repository.
+     */
+    private Resource homeDir;
 
-	/**
-	 * @see org.springframework.extensions.jcr.RepositoryFactoryBean#createRepository()
-	 */
-	protected Repository createRepository() throws Exception {
-		// return JackRabbit repository.
-		return RepositoryImpl.create(repositoryConfig);
-	}
+    /**
+     * Repository configuratin created through Spring.
+     */
+    private RepositoryConfig repositoryConfig;
 
-	/**
-	 * @see org.springframework.extensions.jcr.RepositoryFactoryBean#resolveConfigurationResource()
-	 */
-	protected void resolveConfigurationResource() throws Exception {
-		// read the configuration object
-		if (repositoryConfig != null)
-			return;
+    /**
+     * @see org.springframework.extensions.jcr.RepositoryFactoryBean#createRepository()
+     */
+    protected Repository createRepository() throws Exception {
+        // return JackRabbit repository.
+        return RepositoryImpl.create(repositoryConfig);
+    }
 
-		if (this.configuration == null) {
-			if (log.isDebugEnabled())
-				log
-						.debug("no configuration resource specified, using the default one:"
-								+ DEFAULT_CONF_FILE);
-			configuration = new ClassPathResource(DEFAULT_CONF_FILE);
-		}
+    /**
+     * @see org.springframework.extensions.jcr.RepositoryFactoryBean#resolveConfigurationResource()
+     */
+    protected void resolveConfigurationResource() throws Exception {
+        // read the configuration object
+        if (repositoryConfig != null)
+            return;
 
-		if (homeDir == null) {
-			if (log.isDebugEnabled())
-				log
-						.debug("no repository home dir specified, using the default one:"
-								+ DEFAULT_REP_DIR);
-			homeDir = new FileSystemResource(DEFAULT_REP_DIR);
-		}
+        if (this.configuration == null) {
+            if (LOG.isDebugEnabled())
+                LOG.debug("no configuration resource specified, using the default one:" + DEFAULT_CONF_FILE);
+            configuration = new ClassPathResource(DEFAULT_CONF_FILE);
+        }
 
-		repositoryConfig = RepositoryConfig.create(new InputSource(
-				configuration.getInputStream()), homeDir.getFile()
-				.getAbsolutePath());
-	}
+        if (homeDir == null) {
+            if (LOG.isDebugEnabled())
+                LOG.debug("no repository home dir specified, using the default one:" + DEFAULT_REP_DIR);
+            homeDir = new FileSystemResource(DEFAULT_REP_DIR);
+        }
 
-	/**
-	 * Shutdown method.
-	 * 
-	 */
-	public void destroy() throws Exception {
-		// force cast (but use only the interface)
-		if (repository instanceof JackrabbitRepository)
-			((JackrabbitRepository) repository).shutdown();
-	}
+        repositoryConfig = RepositoryConfig.create(new InputSource(configuration.getInputStream()), homeDir.getFile().getAbsolutePath());
+    }
 
-	/**
-	 * @return Returns the defaultRepDir.
-	 */
-	public Resource getHomeDir() {
-		return this.homeDir;
-	}
+    /**
+     * Shutdown method.
+     */
+    public void destroy() throws Exception {
+        // force cast (but use only the interface)
+        if (repository instanceof JackrabbitRepository)
+            ((JackrabbitRepository) repository).shutdown();
+    }
 
-	/**
-	 * @param defaultRepDir
-	 *            The defaultRepDir to set.
-	 */
-	public void setHomeDir(Resource defaultRepDir) {
-		this.homeDir = defaultRepDir;
-	}
+    /**
+     * @return Returns the defaultRepDir.
+     */
+    public Resource getHomeDir() {
+        return this.homeDir;
+    }
 
-	/**
-	 * @return Returns the repositryConfig.
-	 */
-	public RepositoryConfig getRepositoryConfig() {
-		return this.repositoryConfig;
-	}
+    /**
+     * @param defaultRepDir The defaultRepDir to set.
+     */
+    public void setHomeDir(Resource defaultRepDir) {
+        this.homeDir = defaultRepDir;
+    }
 
-	/**
-	 * @param repositoryConfig
-	 *            The repositryConfig to set.
-	 */
-	public void setRepositoryConfig(RepositoryConfig repositoryConfig) {
-		this.repositoryConfig = repositoryConfig;
-	}
+    /**
+     * @return Returns the repositryConfig.
+     */
+    public RepositoryConfig getRepositoryConfig() {
+        return this.repositoryConfig;
+    }
+
+    /**
+     * @param repositoryConfig The repositryConfig to set.
+     */
+    public void setRepositoryConfig(RepositoryConfig repositoryConfig) {
+        this.repositoryConfig = repositoryConfig;
+    }
 }

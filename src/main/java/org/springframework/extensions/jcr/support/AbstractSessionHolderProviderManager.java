@@ -19,64 +19,54 @@ import java.util.List;
 
 import javax.jcr.Repository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.extensions.jcr.SessionHolderProvider;
 import org.springframework.extensions.jcr.SessionHolderProviderManager;
 
 /**
- * Base implementation for SessionHolderProviderManager that adds most of the
- * functionality needed by the interface. Usually interface implementations will
- * extends this class.
- * 
+ * Base implementation for SessionHolderProviderManager that adds most of the functionality needed by the
+ * interface. Usually interface implementations will extends this class.
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
-public abstract class AbstractSessionHolderProviderManager implements
-		SessionHolderProviderManager {
+public abstract class AbstractSessionHolderProviderManager implements SessionHolderProviderManager {
 
-	protected final Log log = LogFactory.getLog(getClass());
+    protected static final Logger LOG = LoggerFactory.getLogger(AbstractSessionHolderProviderManager.class);
 
-	protected SessionHolderProvider defaultProvider = new GenericSessionHolderProvider();
+    protected SessionHolderProvider defaultProvider = new GenericSessionHolderProvider();
 
-	/**
-	 * Returns all the providers for this class. Subclasses have to implement
-	 * this method.
-	 * 
-	 * @return sessionHolderProviders
-	 */
-	public abstract List getProviders();
+    /**
+     * Returns all the providers for this class. Subclasses have to implement this method.
+     * @return sessionHolderProviders
+     */
+    public abstract List<SessionHolderProvider> getProviders();
 
-	/**
-	 * @see org.springframework.extensions.jcr.SessionHolderProviderManager#getSessionProvider(Repository)
-	 */
-	public SessionHolderProvider getSessionProvider(Repository repository) {
-		// graceful fallback
-		if (repository == null)
-			return defaultProvider;
+    /**
+     * @see org.springframework.extensions.jcr.SessionHolderProviderManager#getSessionProvider(Repository)
+     */
+    public SessionHolderProvider getSessionProvider(Repository repository) {
+        // graceful fallback
+        if (repository == null)
+            return defaultProvider;
 
-		String key = repository.getDescriptor(Repository.REP_NAME_DESC);
-		List providers = getProviders();
+        String key = repository.getDescriptor(Repository.REP_NAME_DESC);
+        List<SessionHolderProvider> providers = getProviders();
 
-		// search the provider
-		for (int i = 0; i < providers.size(); i++) {
-			SessionHolderProvider provider = (SessionHolderProvider) providers
-					.get(i);
-			if (provider.acceptsRepository(key)) {
-				if (log.isDebugEnabled())
-					log
-							.debug("specific SessionHolderProvider found for repository "
-									+ key);
-				return provider;
-			}
-		}
+        // search the provider
+        for (int i = 0; i < providers.size(); i++) {
+            SessionHolderProvider provider = providers.get(i);
+            if (provider.acceptsRepository(key)) {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("specific SessionHolderProvider found for repository " + key);
+                return provider;
+            }
+        }
 
-		// no provider found - return the default one
-		if (log.isDebugEnabled())
-			log.debug("no specific SessionHolderProvider found for repository "
-					+ key + "; using the default one");
-		return defaultProvider;
-	}
+        // no provider found - return the default one
+        if (LOG.isDebugEnabled())
+            LOG.debug("no specific SessionHolderProvider found for repository " + key + "; using the default one");
+        return defaultProvider;
+    }
 }

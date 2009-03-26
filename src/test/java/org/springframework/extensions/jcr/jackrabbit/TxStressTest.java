@@ -29,44 +29,41 @@ import org.springframework.extensions.jcr.JcrTemplate;
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class TxStressTest extends AbstractTransactionalSpringContextTests {
 
-	private JcrTemplate template;
+    private JcrTemplate template;
 
-	protected String[] getConfigLocations() {
-		return new String[] { "txStressTestApplicationContext.xml" };
-	}
+    protected String[] getConfigLocations() {
+        return new String[] { "txStressTestApplicationContext.xml" };
+    }
 
-	public void testMultipleCommits() {
-		for (int i = 0; i < 100; i++) {
-			endTransaction();
-			startNewTransaction();
-			template.execute(new JcrCallback() {
+    public void testMultipleCommits() {
+        for (int i = 0; i < 100; i++) {
+            endTransaction();
+            startNewTransaction();
+            template.execute(new JcrCallback() {
 
-				public Object doInJcr(Session session) throws IOException,
-						RepositoryException {
-					Node rootNode = session.getRootNode();
-					Node one = rootNode.addNode("bla-bla-bla");
-					one.setProperty("some prop", false);
-					Node two = one.addNode("foo");
-					two.setProperty("boo", "hoo");
-					Node three = two.addNode("bar");
-					three.setProperty("whitehorse", new String[] { "super",
-							"ultra", "mega" });
-					session.save();
-					return null;
-				}
-			});
-			setComplete();
-			endTransaction();
+                public Object doInJcr(Session session) throws IOException, RepositoryException {
+                    Node rootNode = session.getRootNode();
+                    Node one = rootNode.addNode("bla-bla-bla");
+                    one.setProperty("some prop", false);
+                    Node two = one.addNode("foo");
+                    two.setProperty("boo", "hoo");
+                    Node three = two.addNode("bar");
+                    three.setProperty("whitehorse", new String[] { "super", "ultra", "mega" });
+                    session.save();
+                    return null;
+                }
+            });
+            setComplete();
+            endTransaction();
 
-		}
+        }
 
-	}
+    }
 
-	public void setTemplate(JcrTemplate template) {
-		this.template = template;
-	}
+    public void setTemplate(JcrTemplate template) {
+        this.template = template;
+    }
 }

@@ -17,87 +17,73 @@ package org.springframework.extensions.jcr.jackrabbit;
 
 import javax.jcr.Workspace;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.extensions.jcr.JcrSessionFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.extensions.jcr.JcrSessionFactory;
 
 /**
- * Jackrabbit specific {@link JcrSessionFactory} which allows registration of
- * node types in <a href="http://jackrabbit.apache.org/node-types.html">Content
- * node types</a> format.
- * 
+ * Jackrabbit specific {@link JcrSessionFactory} which allows registration of node types in <a
+ * href="http://jackrabbit.apache.org/node-types.html">Content node types</a> format.
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class JackrabbitSessionFactory extends JcrSessionFactory {
 
-	private static final Log log = LogFactory
-			.getLog(JackrabbitSessionFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JackrabbitSessionFactory.class);
 
-	/**
-	 * Node definitions in CND format.
-	 */
-	private Resource[] nodeDefinitions;
+    /**
+     * Node definitions in CND format.
+     */
+    private Resource[] nodeDefinitions;
 
-	private String contentType = JackrabbitNodeTypeManager.TEXT_XML;
+    private String contentType = JackrabbitNodeTypeManager.TEXT_XML;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.extensions.jcr.JcrSessionFactory#registerNodeTypes()
-	 */
-	protected void registerNodeTypes() throws Exception {
-		if (!ObjectUtils.isEmpty(nodeDefinitions)) {
-			Workspace ws = getSession().getWorkspace();
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.extensions.jcr.JcrSessionFactory#registerNodeTypes()
+     */
+    protected void registerNodeTypes() throws Exception {
+        if (!ObjectUtils.isEmpty(nodeDefinitions)) {
+            Workspace ws = getSession().getWorkspace();
 
-			// Get the NodeTypeManager from the Workspace.
-			// Note that it must be cast from the generic JCR NodeTypeManager to
-			// the
-			// Jackrabbit-specific implementation.
-			JackrabbitNodeTypeManager nodeTypeManager = (JackrabbitNodeTypeManager) ws
-					.getNodeTypeManager();
+            // Get the NodeTypeManager from the Workspace.
+            // Note that it must be cast from the generic JCR NodeTypeManager to
+            // the
+            // Jackrabbit-specific implementation.
+            JackrabbitNodeTypeManager nodeTypeManager = (JackrabbitNodeTypeManager) ws.getNodeTypeManager();
 
-			boolean debug = log.isDebugEnabled();
-			for (int i = 0; i < nodeDefinitions.length; i++) {
-				Resource resource = nodeDefinitions[i];
-				if (debug)
-					log.debug("adding node type definitions from "
-							+ resource.getDescription());
+            boolean debug = LOG.isDebugEnabled();
+            for (int i = 0; i < nodeDefinitions.length; i++) {
+                Resource resource = nodeDefinitions[i];
+                if (debug)
+                    LOG.debug("adding node type definitions from " + resource.getDescription());
 
-				nodeTypeManager.registerNodeTypes(resource.getInputStream(),
-						contentType);
-			}
-		}
-	}
+                nodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
+            }
+        }
+    }
 
-	/**
-	 * @param nodeDefinitions
-	 *            The nodeDefinitions to set.
-	 */
-	public void setNodeDefinitions(Resource[] nodeDefinitions) {
-		this.nodeDefinitions = nodeDefinitions;
-	}
+    /**
+     * @param nodeDefinitions The nodeDefinitions to set.
+     */
+    public void setNodeDefinitions(Resource[] nodeDefinitions) {
+        this.nodeDefinitions = nodeDefinitions;
+    }
 
-	/**
-	 * Indicate the node definition content type (by default,
-	 * JackrabbitNodeTypeManager#TEXT_XML).
-	 * 
-	 * @see JackrabbitNodeTypeManager#TEXT_X_JCR_CND
-	 * @see JackrabbitNodeTypeManager#TEXT_XML
-	 * 
-	 * @param contentType
-	 *            The contentType to set.
-	 */
-	public void setContentType(String contentType) {
-		Assert.hasText(contentType, "contentType is required");
-		this.contentType = contentType;
-	}
+    /**
+     * Indicate the node definition content type (by default, JackrabbitNodeTypeManager#TEXT_XML).
+     * @see JackrabbitNodeTypeManager#TEXT_X_JCR_CND
+     * @see JackrabbitNodeTypeManager#TEXT_XML
+     * @param contentType The contentType to set.
+     */
+    public void setContentType(String contentType) {
+        Assert.hasText(contentType, "contentType is required");
+        this.contentType = contentType;
+    }
 
 }

@@ -26,5 +26,4 @@
         </FileSystem>
         <PersistenceManager class="org.apache.jackrabbit.core.state.xml.XMLPersistenceManager" />
     </Versioning>
-
 </Repository>

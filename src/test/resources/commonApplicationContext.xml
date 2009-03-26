@@ -14,17 +14,9 @@
 			<bean class="javax.jcr.SimpleCredentials">
 				<constructor-arg index="0" value="bogus"/>
 				<!-- create the credentials using a bean factory -->
-				<constructor-arg index="1">
-					<bean factory-bean="password"
-					      factory-method="toCharArray"/>
-				</constructor-arg>
+				<constructor-arg index="1" value="pass"/>
 			</bean>
 		</property>
-	</bean>
-	
-	<!-- create the password to return it as a char[] -->
-	<bean id="password" class="java.lang.String">
-		<constructor-arg index="0" value="pass"/>
 	</bean>
 	
 	<bean id="jcrTemplate" class="org.springframework.extensions.jcr.JcrTemplate">
