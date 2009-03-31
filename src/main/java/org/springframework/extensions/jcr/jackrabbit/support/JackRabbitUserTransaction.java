@@ -110,7 +110,9 @@ public class JackRabbitUserTransaction implements UserTransaction {
         } catch (XAException e) {
 
             if (e.errorCode >= XAException.XA_RBBASE && e.errorCode <= XAException.XA_RBEND) {
-                throw new RollbackException(e.toString());
+                RollbackException rollbackException = new RollbackException(e.toString());
+                rollbackException.initCause(e);
+                throw rollbackException;
             }
 
             throw new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
