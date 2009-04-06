@@ -34,25 +34,12 @@ import org.apache.jackrabbit.api.XASession;
  */
 public class JackRabbitUserTransaction implements UserTransaction {
 
-    /**
-     * Global transaction id counter. TODO: remove the static attribute
-     */
     private static byte counter = 0;
-
-    /**
-     * XAResource
-     */
 
     private final XAResource xares;
 
-    /**
-     * Xid
-     */
     private Xid xid;
 
-    /**
-     * Status
-     */
     private int status = Status.STATUS_NO_TRANSACTION;
 
     /**
@@ -82,8 +69,9 @@ public class JackRabbitUserTransaction implements UserTransaction {
             status = Status.STATUS_ACTIVE;
 
         } catch (XAException e) {
-
-            throw new SystemException("Unable to begin transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            systemException.initCause(e);
+            throw systemException;
         }
     }
 
@@ -115,7 +103,9 @@ public class JackRabbitUserTransaction implements UserTransaction {
                 throw rollbackException;
             }
 
-            throw new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            systemException.initCause(e);
+            throw systemException;
         }
     }
 
@@ -144,8 +134,9 @@ public class JackRabbitUserTransaction implements UserTransaction {
             status = Status.STATUS_ROLLEDBACK;
 
         } catch (XAException e) {
-
-            throw new SystemException("Unable to rollback transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            systemException.initCause(e);
+            throw systemException;
         }
     }
 
