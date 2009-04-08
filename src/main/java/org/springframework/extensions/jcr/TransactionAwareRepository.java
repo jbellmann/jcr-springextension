@@ -65,7 +65,6 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
 
     private JcrSessionFactory sessionFactory;
     private Repository proxy;
-    private SessionHolderProviderManager sessionHolderProviderManager;
 
     /**
      * allow creation of sessions if none is found on the current thread.

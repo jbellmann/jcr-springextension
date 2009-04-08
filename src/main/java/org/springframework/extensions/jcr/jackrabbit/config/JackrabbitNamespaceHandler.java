@@ -23,40 +23,33 @@ import org.w3c.dom.Element;
 
 /**
  * Jackrabbit specifc namespace handler.
- * 
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class JackrabbitNamespaceHandler extends NamespaceHandlerSupport {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
-	 */
-	public void init() {
-		registerBeanDefinitionParser("repository",
-				new JackrabbitRepositoryBeanDefinitionParser());
-		registerBeanDefinitionParser("transaction-manager",
-				new JackrabbitLocalTransactionManagerBeanDefinitionParser());
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
+     */
+    public void init() {
+        registerBeanDefinitionParser("repository", new JackrabbitRepositoryBeanDefinitionParser());
+        registerBeanDefinitionParser("transaction-manager", new JackrabbitLocalTransactionManagerBeanDefinitionParser());
+    }
 
-	private static class JackrabbitRepositoryBeanDefinitionParser extends
-			AbstractSimpleBeanDefinitionParser {
+    private static class JackrabbitRepositoryBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
-			return RepositoryFactoryBean.class;
-		}
-	}
+        protected Class getBeanClass(Element element) {
+            return RepositoryFactoryBean.class;
+        }
+    }
 
-	private static class JackrabbitLocalTransactionManagerBeanDefinitionParser
-			extends AbstractSimpleBeanDefinitionParser {
+    private static class JackrabbitLocalTransactionManagerBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
-		protected Class getBeanClass(Element element) {
-			return LocalTransactionManager.class;
-		}
-	}
+        protected Class getBeanClass(Element element) {
+            return LocalTransactionManager.class;
+        }
+    }
 
 }

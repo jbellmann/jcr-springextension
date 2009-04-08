@@ -15,8 +15,8 @@
  */
 package org.springframework.extensions.jcr.support;
 
-import org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager;
-import org.springframework.extensions.jcr.support.GenericSessionHolderProvider;
+import static org.easymock.EasyMock.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,153 +25,133 @@ import javax.jcr.Session;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionHolder;
 import org.springframework.extensions.jcr.SessionHolderProvider;
 
 /**
- * 
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class AbstractSessionHolderProviderManagerTest extends TestCase {
 
-	AbstractSessionHolderProviderManager providerManager;
-	List providers;
-	String repositoryName;
-	MockControl sfCtrl, sessCtrl, repoCtrl;
-	Repository repo;
-	Session sess;
-	SessionFactory sf;
-	SessionHolderProvider customProvider;
+    AbstractSessionHolderProviderManager providerManager;
+    List<SessionHolderProvider> providers;
+    String repositoryName;
+    Session session;
+    Repository repository;
+    SessionFactory sessionfactory;
+    SessionHolderProvider customProvider;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+    protected void setUp() throws Exception {
+        super.setUp();
 
-		providers = new ArrayList();
-		repositoryName = "dummyRepository";
+        providers = new ArrayList<SessionHolderProvider>();
+        repositoryName = "dummyRepository";
 
-		providerManager = new AbstractSessionHolderProviderManager() {
-			/**
-			 * @see org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager#getProviders()
-			 */
-			public List getProviders() {
-				return providers;
-			}
-		};
-		// build crazy mock hierarchy
-		sfCtrl = MockControl.createControl(SessionFactory.class);
-		sf = (SessionFactory) sfCtrl.getMock();
-		sessCtrl = MockControl.createControl(Session.class);
-		sess = (Session) sessCtrl.getMock();
-		repoCtrl = MockControl.createControl(Repository.class);
-		repo = (Repository) repoCtrl.getMock();
+        providerManager = new AbstractSessionHolderProviderManager() {
+            public List<SessionHolderProvider> getProviders() {
+                return providers;
+            }
+        };
+        // build crazy mock hierarchy
+        sessionfactory = createMock(SessionFactory.class);
+        session = createMock(Session.class);
+        repository = createMock(Repository.class);
 
-		// sfCtrl.expectAndReturn(sf.getSession(), sess);
-		// sessCtrl.expectAndReturn(sess.getRepository(), repo);
-		repoCtrl.expectAndReturn(repo.getDescriptor(Repository.REP_NAME_DESC),
-				repositoryName);
+        expect(repository.getDescriptor(Repository.REP_NAME_DESC)).andReturn(repositoryName);
 
-		customProvider = new SessionHolderProvider() {
+        customProvider = new SessionHolderProvider() {
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
-			 */
-			public boolean acceptsRepository(String repo) {
-				return repositoryName.equals(repo);
-			}
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
+             */
+            public boolean acceptsRepository(String repo) {
+                return repositoryName.equals(repo);
+            }
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
-			 */
-			public SessionHolder createSessionHolder(Session session) {
-				return null;
-			}
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
+             */
+            public SessionHolder createSessionHolder(Session session) {
+                return null;
+            }
 
-		};
-	}
+        };
+    }
 
-	protected void tearDown() throws Exception {
-		sfCtrl.verify();
-		sessCtrl.verify();
-		repoCtrl.verify();
+    protected void tearDown() throws Exception {
+        verify(sessionfactory);
+        verify(session);
+        verify(repository);
 
-		super.tearDown();
-	}
+        super.tearDown();
+    }
 
-	/*
-	 * Default provider is used even on empty list.
-	 * 
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
-	 */
-	public void testDefaultSessionProvider() {
-		// sanity check
-		assertSame(providers, providerManager.getProviders());
+    /*
+     * Default provider is used even on empty list. Test method for
+     * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
+     */
+    public void testDefaultSessionProvider() {
+        // sanity check
+        assertSame(providers, providerManager.getProviders());
 
-		sfCtrl.replay();
-		sessCtrl.replay();
-		repoCtrl.replay();
+        replay(sessionfactory);
+        replay(session);
+        replay(repository);
 
-		SessionHolderProvider provider = providerManager
-				.getSessionProvider(repo);
-		assertSame(GenericSessionHolderProvider.class, provider.getClass());
-	}
+        SessionHolderProvider provider = providerManager.getSessionProvider(repository);
+        assertSame(GenericSessionHolderProvider.class, provider.getClass());
+    }
 
-	/*
-	 * Make sure that the approapriate provider is selected Test method for
-	 * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
-	 */
-	public void testCustomSessionProvider() {
-		// sanity check
+    /*
+     * Make sure that the approapriate provider is selected Test method for
+     * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
+     */
+    public void testCustomSessionProvider() {
+        // sanity check
+        providers = new ArrayList<SessionHolderProvider>();
+        providers.add(customProvider);
 
-		providers = new ArrayList();
-		providers.add(customProvider);
+        replay(sessionfactory);
+        replay(session);
+        replay(repository);
 
-		sfCtrl.replay();
-		sessCtrl.replay();
-		repoCtrl.replay();
+        assertSame(customProvider, providerManager.getSessionProvider(repository));
+    }
 
-		assertSame(customProvider, providerManager.getSessionProvider(repo));
-	}
+    /*
+     * Make sure that we fallback to default provider Test method for
+     * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
+     */
+    public void testDifferentSessionProvider() {
+        // sanity check
 
-	/*
-	 * Make sure that we fallback to default provider
-	 * 
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
-	 */
-	public void testDifferentSessionProvider() {
-		// sanity check
+        customProvider = new SessionHolderProvider() {
 
-		customProvider = new SessionHolderProvider() {
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
+             */
+            public boolean acceptsRepository(String repo) {
+                return false;
+            }
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
-			 */
-			public boolean acceptsRepository(String repo) {
-				return false;
-			}
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
+             */
+            public SessionHolder createSessionHolder(Session session) {
+                return null;
+            }
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
-			 */
-			public SessionHolder createSessionHolder(Session session) {
-				return null;
-			}
+        };
+        providers = new ArrayList<SessionHolderProvider>();
+        providers.add(customProvider);
 
-		};
-		providers = new ArrayList();
-		providers.add(customProvider);
+        replay(sessionfactory);
+        replay(session);
+        replay(repository);
 
-		sfCtrl.replay();
-		sessCtrl.replay();
-		repoCtrl.replay();
-
-		assertSame(GenericSessionHolderProvider.class, providerManager
-				.getSessionProvider(repo).getClass());
-	}
+        assertSame(GenericSessionHolderProvider.class, providerManager.getSessionProvider(repository).getClass());
+    }
 }

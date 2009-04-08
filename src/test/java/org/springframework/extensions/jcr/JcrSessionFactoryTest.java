@@ -15,10 +15,12 @@
  */
 package org.springframework.extensions.jcr;
 
-import org.springframework.extensions.jcr.EventListenerDefinition;
-import org.springframework.extensions.jcr.SessionHolder;
-import org.springframework.extensions.jcr.JcrSessionFactory;
-import org.springframework.extensions.jcr.SessionHolderProvider;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,398 +34,360 @@ import javax.jcr.observation.ObservationManager;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.extensions.jcr.support.ListSessionHolderProviderManager;
 
 public class JcrSessionFactoryTest extends TestCase {
 
-	private JcrSessionFactory factory;
-
-	private MockControl repoCtrl;
-
-	private Repository repo;
-
-	protected void setUp() throws Exception {
-		super.setUp();
-		repoCtrl = MockControl.createControl(Repository.class);
-		repo = (Repository) repoCtrl.getMock();
-
-		factory = new JcrSessionFactory();
-		factory.setRepository(repo);
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
-		try {
-			repoCtrl.verify();
-		} catch (IllegalStateException ex) {
-			// ignore: test method didn't call replay
-		}
-
-		repoCtrl = null;
-		repo = null;
-		factory = null;
-	}
-
-	/*
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.JcrSessionFactory.getSession()'
-	 */
-	public void testGetSession() {
-		try {
-			repoCtrl.expectAndReturn(repo.login(null, null), null);
-			factory.getSession();
-		} catch (RepositoryException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/*
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.JcrSessionFactory.afterPropertiesSet'
-	 */
-	public void testAfterPropertiesSet() throws Exception {
-		try {
-			factory.setRepository(null);
-			factory.afterPropertiesSet();
-			fail("expected exception (session factory badly initialized");
-		} catch (IllegalArgumentException e) {
-		}
-	}
-
-	public void testConstructor() {
-		factory = new JcrSessionFactory(repo, "ws", null);
-		assertEquals(repo, factory.getRepository());
-		assertEquals("ws", factory.getWorkspaceName());
-		assertNull(factory.getCredentials());
-
-		factory.setWorkspaceName("ws");
-		assertEquals(factory.getWorkspaceName(), "ws");
-	}
-
-	public void testEquals() {
-		assertEquals(factory.hashCode(), repo.hashCode() + 17 * 37);
-		assertFalse(factory.equals(null));
-		assertEquals(factory, factory);
-
-		MockControl repoCtrl2;
-		Repository repo2;
-
-		repoCtrl2 = MockControl.createNiceControl(Repository.class);
-		repo2 = (Repository) repoCtrl2.getMock();
-
-		repoCtrl2.replay();
-		repoCtrl.replay();
-
-		JcrSessionFactory fact2 = new JcrSessionFactory();
-		fact2.setRepository(repo2);
-		assertFalse(factory.equals(fact2));
-	}
-
-	public void testAddListeners() throws RepositoryException {
-		EventListenerDefinition def1 = new EventListenerDefinition();
-		EventListenerDefinition def2 = new EventListenerDefinition();
-
-		EventListenerDefinition listeners[] = new EventListenerDefinition[] {
-				def1, def2 };
-		factory.setEventListeners(listeners);
-
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
-
-		MockControl wsCtrl = MockControl.createControl(Workspace.class);
-		Workspace ws = (Workspace) wsCtrl.getMock();
-
-		MockControl omCtrl = MockControl
-				.createControl(ObservationManager.class);
-		ObservationManager oManager = (ObservationManager) omCtrl.getMock();
+    private JcrSessionFactory factory;
+
+    private Repository repository;
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        repository = (Repository) createMock(Repository.class);
+        factory = new JcrSessionFactory();
+        factory.setRepository(repository);
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        try {
+            verify(repository);
+        } catch (IllegalStateException ex) {
+            // ignore: test method didn't call replay
+        }
+
+        repository = null;
+        factory = null;
+    }
+
+    /*
+     * Test method for 'org.springframework.extensions.jcr.JcrSessionFactory.getSession()'
+     */
+    public void testGetSession() {
+        try {
+
+            expect(repository.login(null, null)).andReturn(null);
+            factory.getSession();
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
 
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
+    /*
+     * Test method for 'org.springframework.extensions.jcr.JcrSessionFactory.afterPropertiesSet'
+     */
+    public void testAfterPropertiesSet() throws Exception {
+        try {
+            factory.setRepository(null);
+            factory.afterPropertiesSet();
+            fail("expected exception (session factory badly initialized");
+        } catch (IllegalArgumentException e) {
+        }
+    }
 
-		wsCtrl.expectAndReturn(ws.getObservationManager(), oManager);
+    public void testConstructor() {
+        factory = new JcrSessionFactory(repository, "ws", null);
+        assertEquals(repository, factory.getRepository());
+        assertEquals("ws", factory.getWorkspaceName());
+        assertNull(factory.getCredentials());
 
-		oManager.addEventListener(def1.getListener(), def1.getEventTypes(),
-				def1.getAbsPath(), def1.isDeep(), def1.getUuid(), def1
-						.getNodeTypeName(), def1.isNoLocal());
-		oManager.addEventListener(def2.getListener(), def2.getEventTypes(),
-				def2.getAbsPath(), def2.isDeep(), def2.getUuid(), def2
-						.getNodeTypeName(), def2.isNoLocal());
+        factory.setWorkspaceName("ws");
+        assertEquals(factory.getWorkspaceName(), "ws");
+    }
 
-		repoCtrl.replay();
-		sessionCtrl.replay();
-		wsCtrl.replay();
-		omCtrl.replay();
+    public void testEquals() {
+        assertEquals(factory.hashCode(), repository.hashCode() + 17 * 37);
+        assertFalse(factory.equals(null));
+        assertEquals(factory, factory);
 
-		// coverage madness
-		assertSame(listeners, factory.getEventListeners());
-		Session sess = factory.getSession();
-		assertSame(session, sess);
+        Repository repo2 = createNiceMock(Repository.class);
 
-		repoCtrl.verify();
-		sessionCtrl.verify();
-		wsCtrl.verify();
-		omCtrl.verify();
-	}
+        replay(repo2);
+        replay(repository);
 
-	public void testRegisterNamespaces() throws Exception {
-		Properties namespaces = new Properties();
-		namespaces.put("foo", "bar");
-		namespaces.put("hocus", "pocus");
+        JcrSessionFactory fact2 = new JcrSessionFactory();
+        fact2.setRepository(repo2);
+        assertFalse(factory.equals(fact2));
+    }
 
-		factory.setNamespaces(namespaces);
+    public void testAddListeners() throws RepositoryException {
+        EventListenerDefinition def1 = new EventListenerDefinition();
+        EventListenerDefinition def2 = new EventListenerDefinition();
 
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
+        EventListenerDefinition listeners[] = new EventListenerDefinition[] { def1, def2 };
+        factory.setEventListeners(listeners);
 
-		MockControl wsCtrl = MockControl.createControl(Workspace.class);
-		Workspace ws = (Workspace) wsCtrl.getMock();
+        Session session = createMock(Session.class);
 
-		MockControl nrCtrl = MockControl.createControl(NamespaceRegistry.class);
-		NamespaceRegistry registry = (NamespaceRegistry) nrCtrl.getMock();
+        Workspace workspace = createMock(Workspace.class);
 
-		// afterPropertiesSet
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
-		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
+        ObservationManager observationManager = createMock(ObservationManager.class);
 
-		nrCtrl.expectAndReturn(registry.getPrefixes(), new String[0]);
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
 
-		// destroy
-		registry.registerNamespace("foo", "bar");
-		registry.registerNamespace("hocus", "pocus");
+        expect(workspace.getObservationManager()).andReturn(observationManager);
 
-		nrCtrl.replay();
-		wsCtrl.replay();
-		sessionCtrl.replay();
-		repoCtrl.replay();
+        observationManager.addEventListener(def1.getListener(), def1.getEventTypes(), def1.getAbsPath(), def1.isDeep(), def1.getUuid(), def1.getNodeTypeName(), def1.isNoLocal());
+        observationManager.addEventListener(def2.getListener(), def2.getEventTypes(), def2.getAbsPath(), def2.isDeep(), def2.getUuid(), def2.getNodeTypeName(), def2.isNoLocal());
 
-		factory.afterPropertiesSet();
+        replay(repository);
+        replay(session);
+        replay(workspace);
+        replay(observationManager);
 
-		factory.destroy();
+        // coverage madness
+        assertSame(listeners, factory.getEventListeners());
+        Session sess = factory.getSession();
+        assertSame(session, sess);
 
-		nrCtrl.verify();
-		wsCtrl.verify();
-		sessionCtrl.verify();
+        verify(repository);
+        verify(session);
+        verify(workspace);
+        verify(observationManager);
+    }
 
-	}
+    public void testRegisterNamespaces() throws Exception {
+        Properties namespaces = new Properties();
+        namespaces.put("foo", "bar");
+        namespaces.put("hocus", "pocus");
 
-	public void testForceRegistryNamespace() throws Exception {
-		String foo = "foo";
-		Properties namespaces = new Properties();
-		namespaces.put(foo, "bar");
-		namespaces.put("hocus", "pocus");
+        factory.setNamespaces(namespaces);
 
-		factory.setNamespaces(namespaces);
-		factory.setForceNamespacesRegistration(true);
-		factory.setSkipExistingNamespaces(false);
-		factory.setKeepNewNamespaces(false);
+        Session session = createMock(Session.class);
 
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
+        Workspace workspace = createMock(Workspace.class);
 
-		MockControl wsCtrl = MockControl.createControl(Workspace.class);
-		Workspace ws = (Workspace) wsCtrl.getMock();
+        NamespaceRegistry namespaceRegistry = createMock(NamespaceRegistry.class);
 
-		MockControl nrCtrl = MockControl.createControl(NamespaceRegistry.class);
-		NamespaceRegistry registry = (NamespaceRegistry) nrCtrl.getMock();
+        // afterPropertiesSet
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
+        expect(workspace.getNamespaceRegistry()).andReturn(namespaceRegistry);
 
-		// afterPropertiesSet
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
-		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
+        expect(namespaceRegistry.getPrefixes()).andReturn(new String[0]);
 
-		// destroy
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
-		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
+        // destroy
+        namespaceRegistry.registerNamespace("foo", "bar");
+        namespaceRegistry.registerNamespace("hocus", "pocus");
 
-		// registry record
-		String[] prefixes = new String[] { foo };
-		String oldURI = "old bar";
-		nrCtrl.expectAndReturn(registry.getPrefixes(), prefixes);
-		nrCtrl.expectAndReturn(registry.getURI(foo), oldURI);
-		registry.unregisterNamespace(foo);
+        replay(namespaceRegistry);
+        replay(workspace);
+        replay(session);
+        replay(repository);
 
-		registry.registerNamespace(foo, "bar");
-		registry.registerNamespace("hocus", "pocus");
+        factory.afterPropertiesSet();
 
-		registry.unregisterNamespace("foo");
-		registry.unregisterNamespace("hocus");
-		registry.registerNamespace(foo, oldURI);
+        factory.destroy();
 
-		nrCtrl.replay();
-		wsCtrl.replay();
-		sessionCtrl.replay();
-		repoCtrl.replay();
+        verify(namespaceRegistry);
+        verify(workspace);
+        verify(session);
 
-		factory.afterPropertiesSet();
-		factory.destroy();
+    }
 
-		nrCtrl.verify();
-		wsCtrl.verify();
-		sessionCtrl.verify();
-	}
+    public void testForceRegistryNamespace() throws Exception {
+        String foo = "foo";
+        Properties namespaces = new Properties();
+        namespaces.put(foo, "bar");
+        namespaces.put("hocus", "pocus");
 
-	public void testKeepRegistryNamespace() throws Exception {
-		Properties namespaces = new Properties();
-		namespaces.put("foo", "bar");
-		namespaces.put("hocus", "pocus");
+        factory.setNamespaces(namespaces);
+        factory.setForceNamespacesRegistration(true);
+        factory.setSkipExistingNamespaces(false);
+        factory.setKeepNewNamespaces(false);
 
-		factory.setNamespaces(namespaces);
-		factory.setKeepNewNamespaces(true);
+        Session session = createMock(Session.class);
 
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
+        Workspace workspace = createMock(Workspace.class);
 
-		MockControl wsCtrl = MockControl.createControl(Workspace.class);
-		Workspace ws = (Workspace) wsCtrl.getMock();
+        NamespaceRegistry namespaceRegistry = createMock(NamespaceRegistry.class);
 
-		MockControl nrCtrl = MockControl.createControl(NamespaceRegistry.class);
-		NamespaceRegistry registry = (NamespaceRegistry) nrCtrl.getMock();
+        // afterPropertiesSet
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
+        expect(workspace.getNamespaceRegistry()).andReturn(namespaceRegistry);
 
-		// afterPropertiesSet
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
-		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
+        // destroy
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
+        expect(workspace.getNamespaceRegistry()).andReturn(namespaceRegistry);
 
-		nrCtrl.expectAndReturn(registry.getPrefixes(), new String[0]);
+        // registry record
+        String[] prefixes = new String[] { foo };
+        String oldURI = "old bar";
+        expect(namespaceRegistry.getPrefixes()).andReturn(prefixes);
+        expect(namespaceRegistry.getURI(foo)).andReturn(oldURI);
+        namespaceRegistry.unregisterNamespace(foo);
 
-		registry.registerNamespace("foo", "bar");
-		registry.registerNamespace("hocus", "pocus");
+        namespaceRegistry.registerNamespace(foo, "bar");
+        namespaceRegistry.registerNamespace("hocus", "pocus");
 
-		nrCtrl.replay();
-		wsCtrl.replay();
-		sessionCtrl.replay();
-		repoCtrl.replay();
+        namespaceRegistry.unregisterNamespace("foo");
+        namespaceRegistry.unregisterNamespace("hocus");
+        namespaceRegistry.registerNamespace(foo, oldURI);
 
-		factory.afterPropertiesSet();
+        replay(namespaceRegistry);
+        replay(workspace);
+        replay(session);
+        replay(repository);
 
-		factory.destroy();
+        factory.afterPropertiesSet();
+        factory.destroy();
 
-		nrCtrl.verify();
-		wsCtrl.verify();
-		sessionCtrl.verify();
-	}
+        verify(namespaceRegistry);
+        verify(workspace);
+        verify(session);
+    }
 
-	public void testSkipRegisteredNamespaces() throws Exception {
-		Properties namespaces = new Properties();
-		namespaces.put("foo", "bar");
-		namespaces.put("hocus", "pocus");
+    public void testKeepRegistryNamespace() throws Exception {
+        Properties namespaces = new Properties();
+        namespaces.put("foo", "bar");
+        namespaces.put("hocus", "pocus");
 
-		factory.setNamespaces(namespaces);
-		factory.setSkipExistingNamespaces(false);
+        factory.setNamespaces(namespaces);
+        factory.setKeepNewNamespaces(true);
 
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
+        Session session = createMock(Session.class);
 
-		MockControl wsCtrl = MockControl.createControl(Workspace.class);
-		Workspace ws = (Workspace) wsCtrl.getMock();
+        Workspace workspace = createMock(Workspace.class);
 
-		MockControl nrCtrl = MockControl.createControl(NamespaceRegistry.class);
-		NamespaceRegistry registry = (NamespaceRegistry) nrCtrl.getMock();
+        NamespaceRegistry namespaceRegistry = createMock(NamespaceRegistry.class);
 
-		// afterPropertiesSet
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
-		sessionCtrl.expectAndReturn(session.getWorkspace(), ws);
-		wsCtrl.expectAndReturn(ws.getNamespaceRegistry(), registry);
+        // afterPropertiesSet
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
+        expect(workspace.getNamespaceRegistry()).andReturn(namespaceRegistry);
 
-		registry.registerNamespace("foo", "bar");
-		registry.registerNamespace("hocus", "pocus");
+        expect(namespaceRegistry.getPrefixes()).andReturn(new String[0]);
 
-		nrCtrl.expectAndReturn(registry.getPrefixes(), new String[0]);
-		nrCtrl.replay();
-		wsCtrl.replay();
-		sessionCtrl.replay();
-		repoCtrl.replay();
+        namespaceRegistry.registerNamespace("foo", "bar");
+        namespaceRegistry.registerNamespace("hocus", "pocus");
 
-		factory.afterPropertiesSet();
+        replay(namespaceRegistry);
+        replay(workspace);
+        replay(session);
+        replay(repository);
 
-		factory.destroy();
+        factory.afterPropertiesSet();
 
-		nrCtrl.verify();
-		wsCtrl.verify();
-		sessionCtrl.verify();
-	}
+        factory.destroy();
 
-	public void testDefaultSesionHolder() throws Exception {
-		factory.afterPropertiesSet();
-		Session session = factory.getSession();
-		SessionHolder holder = factory.getSessionHolder(session);
-		assertSame(SessionHolder.class, holder.getClass());
-		// default session holder provider
-		assertSame(SessionHolder.class, factory.getSessionHolder(null)
-				.getClass());
-	}
+        verify(namespaceRegistry);
+        verify(workspace);
+        verify(session);
+    }
 
-	public void testSessionHolder() throws Exception {
-		final String REPO_NAME = "hocus_pocus";
+    public void testSkipRegisteredNamespaces() throws Exception {
+        Properties namespaces = new Properties();
+        namespaces.put("foo", "bar");
+        namespaces.put("hocus", "pocus");
 
-		repoCtrl.expectAndReturn(repo.getDescriptor(Repository.REP_NAME_DESC),
-				REPO_NAME);
+        factory.setNamespaces(namespaces);
+        factory.setSkipExistingNamespaces(false);
 
-		MockControl sessionCtrl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionCtrl.getMock();
+        Session session = createMock(Session.class);
 
-		repoCtrl.expectAndReturn(repo.login(null, null), session);
+        Workspace workspace = createMock(Workspace.class);
 
-		repoCtrl.replay();
-		sessionCtrl.replay();
+        NamespaceRegistry namespaceRegistry = createMock(NamespaceRegistry.class);
 
-		List providers = new ArrayList();
+        // afterPropertiesSet
+        expect(repository.login(null, null)).andReturn(session);
+        expect(session.getWorkspace()).andReturn(workspace);
+        expect(workspace.getNamespaceRegistry()).andReturn(namespaceRegistry);
 
-		providers.add(new SessionHolderProvider() {
+        namespaceRegistry.registerNamespace("foo", "bar");
+        namespaceRegistry.registerNamespace("hocus", "pocus");
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
-			 */
-			public boolean acceptsRepository(String repositoryName) {
-				return REPO_NAME.equals(repositoryName);
-			}
+        expect(namespaceRegistry.getPrefixes()).andReturn(new String[0]);
+        replay(namespaceRegistry);
+        replay(workspace);
+        replay(session);
+        replay(repository);
 
-			/**
-			 * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
-			 */
-			public SessionHolder createSessionHolder(Session session) {
-				return new CustomSessionHolder(session);
-			}
+        factory.afterPropertiesSet();
 
-		});
+        factory.destroy();
 
-		ListSessionHolderProviderManager providerManager = new ListSessionHolderProviderManager();
-		providerManager.setProviders(providers);
+        verify(namespaceRegistry);
+        verify(workspace);
+        verify(session);
+    }
 
-		factory.setSessionHolderProviderManager(providerManager);
-		factory.afterPropertiesSet();
+    public void testDefaultSesionHolder() throws Exception {
+        factory.afterPropertiesSet();
+        Session session = factory.getSession();
+        SessionHolder holder = factory.getSessionHolder(session);
+        assertSame(SessionHolder.class, holder.getClass());
+        // default session holder provider
+        assertSame(SessionHolder.class, factory.getSessionHolder(null).getClass());
+    }
 
-		Session sess = factory.getSession();
-		assertSame(session, sess);
-		assertSame(CustomSessionHolder.class, factory.getSessionHolder(sess)
-				.getClass());
+    public void testSessionHolder() throws Exception {
+        final String REPO_NAME = "hocus_pocus";
 
-		repoCtrl.verify();
-		sessionCtrl.verify();
-	}
+        expect(repository.getDescriptor(Repository.REP_NAME_DESC)).andReturn(REPO_NAME);
 
-	/**
-	 * Used for testing.
-	 * 
-	 * @author Costin Leau
-	 * @author Sergio Bossa
-	 * @author Salvatore Incandela
-	 * 
-	 */
-	private class CustomSessionHolder extends SessionHolder {
+        Session session = createMock(Session.class);
 
-		/**
-		 * @param session
-		 */
-		public CustomSessionHolder(Session session) {
-			super(session);
+        expect(repository.login(null, null)).andReturn(session);
 
-		}
+        replay(repository);
+        replay(session);
 
-	}
+        List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
+
+        providers.add(new SessionHolderProvider() {
+
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
+             */
+            public boolean acceptsRepository(String repositoryName) {
+                return REPO_NAME.equals(repositoryName);
+            }
+
+            /**
+             * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
+             */
+            public SessionHolder createSessionHolder(Session session) {
+                return new CustomSessionHolder(session);
+            }
+
+        });
+
+        ListSessionHolderProviderManager providerManager = new ListSessionHolderProviderManager();
+        providerManager.setProviders(providers);
+
+        factory.setSessionHolderProviderManager(providerManager);
+        factory.afterPropertiesSet();
+
+        Session sess = factory.getSession();
+        assertSame(session, sess);
+        assertSame(CustomSessionHolder.class, factory.getSessionHolder(sess).getClass());
+
+        verify(repository);
+        verify(session);
+    }
+
+    /**
+     * Used for testing.
+     * @author Costin Leau
+     * @author Sergio Bossa
+     * @author Salvatore Incandela
+     */
+    private class CustomSessionHolder extends SessionHolder {
+
+        /**
+         * @param session
+         */
+        public CustomSessionHolder(Session session) {
+            super(session);
+
+        }
+
+    }
 
 }

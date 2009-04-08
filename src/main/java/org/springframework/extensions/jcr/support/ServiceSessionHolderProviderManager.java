@@ -26,40 +26,31 @@ import sun.misc.Service;
 import sun.misc.ServiceConfigurationError;
 
 /**
- * Implementation of SessionHolderProviderManager which does dynamic discovery
- * of the providers using the JDK 1.3+ <a href=
- * "http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider">
- * 'Service Provider' specification</a>.
- * 
- * The class will look for
- * org.springframework.extensions.jcr.SessionHolderProvider property files in
- * META-INF/services directories.
- * 
+ * Implementation of SessionHolderProviderManager which does dynamic discovery of the providers using the JDK
+ * 1.5+ <a href= "http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> 'Service Provider'
+ * specification</a>. The class will look for org.springframework.extensions.jcr.SessionHolderProvider
+ * property files in META-INF/services directories.
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
-public class ServiceSessionHolderProviderManager extends
-		CacheableSessionHolderProviderManager {
+public class ServiceSessionHolderProviderManager extends CacheableSessionHolderProviderManager {
 
-	/**
-	 * Loads the service providers using the discovery mechanism.
-	 * 
-	 * @return the list of service providers found.
-	 */
-	public List getProviders() {
-		Iterator i = Service.providers(SessionHolderProvider.class, Thread
-				.currentThread().getContextClassLoader());
-		List providers = new ArrayList();
-		for (; i.hasNext();) {
-			try {
-				providers.add(i.next());
-			} catch (ServiceConfigurationError sce) {
-				if (!(sce.getCause() instanceof SecurityException))
-					throw sce;
-			}
-		}
-		return Collections.unmodifiableList(providers);
-	}
+    /**
+     * Loads the service providers using the discovery mechanism.
+     * @return the list of service providers found.
+     */
+    public List<SessionHolderProvider> getProviders() {
+        Iterator<SessionHolderProvider> providersIterator = Service.providers(SessionHolderProvider.class, Thread.currentThread().getContextClassLoader());
+        List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
+        while (providersIterator.hasNext()) {
+            try {
+                providers.add(providersIterator.next());
+            } catch (ServiceConfigurationError sce) {
+                if (!(sce.getCause() instanceof SecurityException))
+                    throw sce;
+            }
+        }
+        return Collections.unmodifiableList(providers);
+    }
 }

@@ -212,7 +212,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         }
 
         // do the registration
-        for (Object entry : namespaces.entrySet()) {
+        for (Map.Entry entry : namespaces.entrySet()) {
             Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
             String prefix = (String) namespace.getKey();
             String ns = (String) namespace.getValue();
@@ -259,7 +259,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
             if (LOG.isDebugEnabled())
                 LOG.debug("reverting back overwritten namespaces " + overwrittenNamespaces);
             if (overwrittenNamespaces != null)
-                for (Object entry : overwrittenNamespaces.entrySet()) {
+                for (Map.Entry<String, String> entry : overwrittenNamespaces.entrySet()) {
                     Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
                     registry.registerNamespace((String) namespace.getKey(), (String) namespace.getValue());
                 }
@@ -270,7 +270,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
      * @see org.springframework.extensions.jcr.SessionFactory#getSession()
      */
     public Session getSession() throws RepositoryException {
-        return addListeners(repository.login(credentials, workspaceName));
+        Session session = repository.login(credentials, workspaceName);
+        return addListeners(session);
     }
 
     /**

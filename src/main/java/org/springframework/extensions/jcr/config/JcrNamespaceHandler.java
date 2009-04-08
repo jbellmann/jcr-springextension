@@ -24,113 +24,91 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import org.springframework.core.Constants;
-import org.springframework.util.xml.DomUtils;
 import org.springframework.extensions.jcr.EventListenerDefinition;
 import org.springframework.extensions.jcr.JcrSessionFactory;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * NamespaceHandler for Jcr tags.
- * 
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class JcrNamespaceHandler extends NamespaceHandlerSupport {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
-	 */
-	public void init() {
-		// registerBeanDefinitionParser("repository", new
-		// JcrBeanDefinitionParser());
-		registerBeanDefinitionParser("eventListenerDefinition",
-				new JcrEventListenerBeanDefinitionParser());
-		registerBeanDefinitionParser("sessionFactory",
-				new JcrSessionFactoryBeanDefinitionParser());
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
+     */
+    public void init() {
+        // registerBeanDefinitionParser("repository", new
+        // JcrBeanDefinitionParser());
+        registerBeanDefinitionParser("eventListenerDefinition", new JcrEventListenerBeanDefinitionParser());
+        registerBeanDefinitionParser("sessionFactory", new JcrSessionFactoryBeanDefinitionParser());
+    }
 
-	private class JcrEventListenerBeanDefinitionParser extends
-			AbstractSimpleBeanDefinitionParser {
-		public static final String EVENT_TYPE = "eventType";
+    private class JcrEventListenerBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+        public static final String EVENT_TYPE = "eventType";
 
-		public static final String NODE_TYPE_NAME = "nodeTypeName";
+        public static final String NODE_TYPE_NAME = "nodeTypeName";
 
-		public static final String UUID = "uuid";
+        public static final String UUID = "uuid";
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
-		 * #getBeanClass(org.w3c.dom.Element)
-		 */
-		protected Class getBeanClass(Element element) {
-			return EventListenerDefinition.class;
-		}
+        /*
+         * (non-Javadoc)
+         * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
+         * #getBeanClass(org.w3c.dom.Element)
+         */
+        protected Class getBeanClass(Element element) {
+            return EventListenerDefinition.class;
+        }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser
-		 * #postProcess(org.springframework.beans.factory.support.
-		 * BeanDefinitionBuilder, org.w3c.dom.Element)
-		 */
-		protected void postProcess(BeanDefinitionBuilder definitionBuilder,
-				Element element) {
-			NodeList childNodes = element.getChildNodes();
-			List eventTypes = DomUtils.getChildElementsByTagName(element,
-					EVENT_TYPE);
-			if (eventTypes != null && eventTypes.size() > 0) {
-				// compute event type
-				int eventType = 0;
-				Constants types = new Constants(Event.class);
-				for (Iterator iter = eventTypes.iterator(); iter.hasNext();) {
-					Element evenTypeElement = (Element) iter.next();
-					eventType |= types.asNumber(
-							DomUtils.getTextValue(evenTypeElement)).intValue();
-				}
-				definitionBuilder.addPropertyValue(EVENT_TYPE, new Integer(
-						eventType));
-			}
+        /*
+         * (non-Javadoc)
+         * @see org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser
+         * #postProcess(org.springframework.beans.factory.support. BeanDefinitionBuilder, org.w3c.dom.Element)
+         */
+        protected void postProcess(BeanDefinitionBuilder definitionBuilder, Element element) {
+            List eventTypes = DomUtils.getChildElementsByTagName(element, EVENT_TYPE);
+            if (eventTypes != null && eventTypes.size() > 0) {
+                // compute event type
+                int eventType = 0;
+                Constants types = new Constants(Event.class);
+                for (Iterator iter = eventTypes.iterator(); iter.hasNext();) {
+                    Element evenTypeElement = (Element) iter.next();
+                    eventType |= types.asNumber(DomUtils.getTextValue(evenTypeElement)).intValue();
+                }
+                definitionBuilder.addPropertyValue(EVENT_TYPE, new Integer(eventType));
+            }
 
-			List nodeTypeNames = DomUtils.getChildElementsByTagName(element,
-					NODE_TYPE_NAME);
-			String[] nodeTypeValues = new String[nodeTypeNames.size()];
+            List nodeTypeNames = DomUtils.getChildElementsByTagName(element, NODE_TYPE_NAME);
+            String[] nodeTypeValues = new String[nodeTypeNames.size()];
 
-			for (int i = 0; i < nodeTypeValues.length; i++) {
-				nodeTypeValues[i] = DomUtils
-						.getTextValue((Element) nodeTypeNames.get(i));
-			}
-			definitionBuilder.addPropertyValue(NODE_TYPE_NAME, nodeTypeValues);
-			List uuids = DomUtils.getChildElementsByTagName(element, UUID);
+            for (int i = 0; i < nodeTypeValues.length; i++) {
+                nodeTypeValues[i] = DomUtils.getTextValue((Element) nodeTypeNames.get(i));
+            }
+            definitionBuilder.addPropertyValue(NODE_TYPE_NAME, nodeTypeValues);
+            List uuids = DomUtils.getChildElementsByTagName(element, UUID);
 
-			String[] uuidsValues = new String[uuids.size()];
+            String[] uuidsValues = new String[uuids.size()];
 
-			for (int i = 0; i < uuidsValues.length; i++) {
-				uuidsValues[i] = DomUtils.getTextValue((Element) uuids.get(i));
-			}
+            for (int i = 0; i < uuidsValues.length; i++) {
+                uuidsValues[i] = DomUtils.getTextValue((Element) uuids.get(i));
+            }
 
-			definitionBuilder.addPropertyValue(UUID, uuidsValues);
-		}
-	}
+            definitionBuilder.addPropertyValue(UUID, uuidsValues);
+        }
+    }
 
-	private class JcrSessionFactoryBeanDefinitionParser extends
-			AbstractSimpleBeanDefinitionParser {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
-		 * #getBeanClass(org.w3c.dom.Element)
-		 */
-		protected Class getBeanClass(Element element) {
-			return JcrSessionFactory.class;
-		}
-	}
+    private class JcrSessionFactoryBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+        /*
+         * (non-Javadoc)
+         * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
+         * #getBeanClass(org.w3c.dom.Element)
+         */
+        protected Class getBeanClass(Element element) {
+            return JcrSessionFactory.class;
+        }
+    }
 }
