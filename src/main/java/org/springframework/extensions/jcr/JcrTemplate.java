@@ -41,7 +41,6 @@ import javax.jcr.query.QueryResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.CollectionFactory;
 import org.springframework.dao.DataAccessException;
 import org.xml.sax.ContentHandler;
 
@@ -617,32 +616,35 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
             public Object doInJcr(Session session) throws RepositoryException {
                 // check language
                 String lang = language;
-                if (lang == null)
+                if (lang == null) {
                     lang = Query.XPATH;
+                }
                 boolean debug = LOG.isDebugEnabled();
 
-                Map<String,QueryResult> map = new LinkedHashMap<String, QueryResult>(list.size());
+                Map<String, QueryResult> map = new LinkedHashMap<String, QueryResult>(list.size());
 
                 // get query manager
                 QueryManager manager = session.getWorkspace().getQueryManager();
-                if (debug)
+                if (debug) {
                     LOG.debug("retrieved manager " + manager);
+                }
                 for (Iterator<String> iter = list.iterator(); iter.hasNext();) {
                     String statement = (String) iter.next();
 
                     Query query = manager.createQuery(statement, lang);
-                    if (debug)
+                    if (debug) {
                         LOG.debug("created query " + query);
-
+                    }
                     QueryResult result;
                     try {
                         result = query.execute();
                         map.put(statement, result);
                     } catch (RepositoryException e) {
-                        if (ignoreErrors)
+                        if (ignoreErrors) {
                             map.put(statement, null);
-                        else
+                        } else {
                             throw convertJcrAccessException(e);
+                        }
                     }
                 }
                 return map;
