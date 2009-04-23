@@ -18,6 +18,8 @@ package org.springframework.extensions.jcr.support;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.extensions.jcr.SessionHolderProvider;
+
 /**
  * List based implementation of SessionHolderProviderManager. This class should is intended mainly for testing
  * or for declaring SessionHolderProviders in Spring context files.
@@ -27,19 +29,19 @@ import java.util.List;
  */
 public class ListSessionHolderProviderManager extends CacheableSessionHolderProviderManager {
 
-    private List providers = Collections.EMPTY_LIST;
+    private List<SessionHolderProvider> providers = Collections.emptyList();
 
     /**
      * @see org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager#getProviders()
      */
-    public List getProviders() {
+    public List<SessionHolderProvider> getProviders() {
         return providers;
     }
 
     /**
      * @param providers The providers to set.
      */
-    public void setProviders(List providers) {
+    public void setProviders(List<SessionHolderProvider> providers) {
         this.providers = providers;
     }
 

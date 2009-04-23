@@ -15,12 +15,10 @@
  */
 package org.springframework.extensions.jcr.support;
 
-import java.util.Map;
-
 import javax.jcr.Repository;
 
-import org.springframework.util.CachingMapDecorator;
 import org.springframework.extensions.jcr.SessionHolderProvider;
+import org.springframework.util.CachingMapDecorator;
 
 /**
  * Manager which caches providers in order to avoid lookups.
@@ -53,7 +51,7 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
     /**
      * Providers cache.
      */
-    private final Map providersCache = new ProvidersCache();
+    private final ProvidersCache providersCache = new ProvidersCache();
 
     /**
      * Method for retrieving the parent functionality.

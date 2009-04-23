@@ -15,6 +15,7 @@
  */
 package org.springframework.extensions.jcr.support;
 
+import org.springframework.extensions.jcr.SessionHolderProvider;
 import org.springframework.extensions.jcr.support.ServiceSessionHolderProviderManager;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class ServiceSessionHolderProviderManagerTest extends TestCase {
      * 'org.springframework.extensions.jcr.support.ServiceSessionHolderProviderManager.getProviders()'
      */
     public void testGetProviders() {
-        List providers = providerManager.getProviders();
+        List<SessionHolderProvider> providers = providerManager.getProviders();
         assertEquals(1, providers.size());
         assertTrue(providers.get(0) instanceof JackRabbitSessionHolderProvider);
     }

@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -620,13 +621,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
                     lang = Query.XPATH;
                 boolean debug = LOG.isDebugEnabled();
 
-                Map map = CollectionFactory.createLinkedMapIfPossible(list.size());
+                Map<String,QueryResult> map = new LinkedHashMap<String, QueryResult>(list.size());
 
                 // get query manager
                 QueryManager manager = session.getWorkspace().getQueryManager();
                 if (debug)
                     LOG.debug("retrieved manager " + manager);
-                for (Iterator iter = list.iterator(); iter.hasNext();) {
+                for (Iterator<String> iter = list.iterator(); iter.hasNext();) {
                     String statement = (String) iter.next();
 
                     Query query = manager.createQuery(statement, lang);

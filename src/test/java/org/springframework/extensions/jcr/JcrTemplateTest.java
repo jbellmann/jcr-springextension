@@ -675,9 +675,7 @@ public class JcrTemplateTest extends TestCase {
     public void testDumpNode() throws RepositoryException {
 
         Node node = createNiceMock(Node.class);
-
         PropertyIterator iterator = createMock(PropertyIterator.class);
-
         NodeIterator iter = createMock(NodeIterator.class);
 
         expect(node.getPath()).andReturn("path");
@@ -745,14 +743,9 @@ public class JcrTemplateTest extends TestCase {
             // it's okay
         }
 
-        Node nd = createMock(Node.class);
-
         Workspace workspace = createMock(Workspace.class);
-
         QueryManager queryManager = createMock(QueryManager.class);
-
         Query query = createMock(Query.class);
-
         QueryResult result = createMock(QueryResult.class);
 
         String stmt = "//*/@bogus:title";
@@ -809,14 +802,9 @@ public class JcrTemplateTest extends TestCase {
 
         String language = Query.XPATH;
 
-        Node nd = createMock(Node.class);
-
         Workspace workspace = createMock(Workspace.class);
-
         QueryManager queryManager = createMock(QueryManager.class);
-
         Query query = createMock(Query.class);
-
         QueryResult result = createMock(QueryResult.class);
 
         expect(session.getWorkspace()).andReturn(workspace);

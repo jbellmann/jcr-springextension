@@ -15,15 +15,17 @@
  */
 package org.springframework.extensions.jcr.support;
 
-import org.springframework.extensions.jcr.support.JcrDaoSupport;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
+
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
 import org.springframework.extensions.jcr.JcrTemplate;
 import org.springframework.extensions.jcr.SessionFactory;
 
@@ -31,148 +33,132 @@ import org.springframework.extensions.jcr.SessionFactory;
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class JcrDaoSupportTest extends TestCase {
 
-	private MockControl sfCtrl, sessCtrl, repositoryCtrl;
-	private SessionFactory sf;
-	private Session sess;
+    private SessionFactory sessionFactory;
+    private Session session;
+    private Repository repository;
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		sfCtrl = MockControl.createControl(SessionFactory.class);
-		sf = (SessionFactory) sfCtrl.getMock();
+    protected void setUp() throws Exception {
+        super.setUp();
+        sessionFactory = createMock(SessionFactory.class);
 
-		sessCtrl = MockControl.createControl(Session.class);
-		sess = (Session) sessCtrl.getMock();
-		repositoryCtrl = MockControl.createNiceControl(Repository.class);
+        session = createMock(Session.class);
+        repository = createMock(Repository.class);
 
-	}
+    }
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+    protected void tearDown() throws Exception {
+        super.tearDown();
 
-		try {
-			sessCtrl.verify();
-			sfCtrl.verify();
-			repositoryCtrl.verify();
-		} catch (IllegalStateException ex) {
-			// ignore: test method didn't call replay
-		}
-	}
+        try {
+            verify(session);
+            verify(sessionFactory);
+            verify(repository);
+        } catch (IllegalStateException ex) {
+            // ignore: test method didn't call replay
+        }
+    }
 
-	public void testJcrDaoSupportWithSessionFactory() throws Exception {
+    public void testJcrDaoSupportWithSessionFactory() throws Exception {
 
-		// used for ServiceProvider
-		/*
-		 * sessCtrl.expectAndReturn(sess.getRepository(), repository,
-		 * MockControl.ONE_OR_MORE); sfCtrl.expectAndReturn(sf.getSession(),
-		 * sess);
-		 */sfCtrl.replay();
-		sessCtrl.replay();
+        replay(sessionFactory);
+        replay(session);
 
-		JcrDaoSupport dao = new JcrDaoSupport() {
-			public void smth() {
-			};
-		};
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
-		dao.setSessionFactory(sf);
-		dao.afterPropertiesSet();
-		assertEquals("Correct SessionFactory", sf, dao.getSessionFactory());
-		// assertEquals("Correct JcrTemplate", sf,
-		// dao.getJcrTemplate().getSessionFactory());
-		sfCtrl.verify();
-	}
+        dao.setSessionFactory(sessionFactory);
+        dao.afterPropertiesSet();
+        assertEquals("Correct SessionFactory", sessionFactory, dao.getSessionFactory());
+        verify(sessionFactory);
+    }
 
-	public void testJcrDaoSupportWithJcrTemplate() throws Exception {
+    public void testJcrDaoSupportWithJcrTemplate() throws Exception {
 
-		JcrTemplate template = new JcrTemplate();
-		JcrDaoSupport dao = new JcrDaoSupport() {
-			public void smth() {
-			};
-		};
+        JcrTemplate template = new JcrTemplate();
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
-		dao.setTemplate(template);
-		dao.afterPropertiesSet();
-		assertEquals("Correct JcrTemplate", template, dao.getTemplate());
-	}
+        dao.setTemplate(template);
+        dao.afterPropertiesSet();
+        assertEquals("Correct JcrTemplate", template, dao.getTemplate());
+    }
 
-	public void testAfterPropertiesSet() {
-		JcrDaoSupport dao = new JcrDaoSupport() {
-		};
+    public void testAfterPropertiesSet() {
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
-		try {
-			dao.afterPropertiesSet();
-			fail("expected exception");
-		} catch (IllegalArgumentException e) {
-			//
-		}
-	}
+        try {
+            dao.afterPropertiesSet();
+            fail("expected exception");
+        } catch (IllegalArgumentException e) {
+            //
+        }
+    }
 
-	public void testSetSessionFactory() throws RepositoryException {
-		// sessCtrl.expectAndReturn(sess.getRepository(), repository,
-		// MockControl.ONE_OR_MORE);
-		// sfCtrl.expectAndReturn(sf.getSession(), sess);
-		sfCtrl.replay();
-		sessCtrl.replay();
+    public void testSetSessionFactory() throws RepositoryException {
+        // sessCtrl.expectAndReturn(sess.getRepository(), repository,
+        // MockControl.ONE_OR_MORE);
+        // sfCtrl.expectAndReturn(sf.getSession(), sess);
+        replay(sessionFactory);
+        replay(session);
 
-		JcrDaoSupport dao = new JcrDaoSupport() {
-		};
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
-		dao.setSessionFactory(sf);
+        dao.setSessionFactory(sessionFactory);
 
-		assertEquals(dao.getSessionFactory(), sf);
-	}
+        assertEquals(dao.getSessionFactory(), sessionFactory);
+    }
 
-	public void testGetSession() throws RepositoryException {
-		JcrDaoSupport dao = new JcrDaoSupport() {
-		};
-		// used for service provider
+    public void testGetSession() throws RepositoryException {
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
+        // used for service provider
 
-		sfCtrl.expectAndReturn(sf.getSession(), sess);
-		sfCtrl.replay();
-		sessCtrl.replay();
+        expect(sessionFactory.getSession()).andReturn(session);
+        replay(sessionFactory);
+        replay(session);
 
-		dao.setSessionFactory(sf);
-		dao.afterPropertiesSet();
-		try {
-			dao.getSession();
-			fail("expected exception");
-		} catch (IllegalStateException e) {
-			// it's okay
-		}
-		assertEquals(dao.getSession(true), sess);
-	}
+        dao.setSessionFactory(sessionFactory);
+        dao.afterPropertiesSet();
+        try {
+            dao.getSession();
+            fail("expected exception");
+        } catch (IllegalStateException e) {
+            // it's okay
+        }
+        assertEquals(dao.getSession(true), session);
+    }
 
-	public void testReleaseSession() {
-		JcrDaoSupport dao = new JcrDaoSupport() {
-		};
+    public void testReleaseSession() {
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
-		dao.releaseSession(null);
+        dao.releaseSession(null);
 
-		sess.logout();
+        session.logout();
 
-		sfCtrl.replay();
-		sessCtrl.replay();
+        replay(sessionFactory);
+        replay(session);
 
-		dao.setSessionFactory(sf);
-		dao.afterPropertiesSet();
-		dao.releaseSession(sess);
-	}
+        dao.setSessionFactory(sessionFactory);
+        dao.afterPropertiesSet();
+        dao.releaseSession(session);
+    }
 
-	public void testConvertException() {
-		JcrDaoSupport dao = new JcrDaoSupport() {
-		};
-		MockControl tCtrl = MockClassControl.createControl(JcrTemplate.class);
-		JcrTemplate t = (JcrTemplate) tCtrl.getMock();
+    public void testConvertException() {
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
+        JcrTemplate jcrTemplate = createMock(JcrTemplate.class);
 
-		RepositoryException ex = new RepositoryException();
+        RepositoryException ex = new RepositoryException();
 
-		tCtrl.expectAndReturn(t.convertJcrAccessException(ex), null);
-		dao.setTemplate(t);
-		dao.convertJcrAccessException(ex);
-
-	}
+        expect(jcrTemplate.convertJcrAccessException(ex)).andReturn(null);
+        dao.setTemplate(jcrTemplate);
+        dao.convertJcrAccessException(ex);
+    }
 
 }
