@@ -15,6 +15,7 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
+import javax.jcr.RepositoryException;
 import javax.jcr.Workspace;
 
 import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
@@ -60,10 +61,14 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
             boolean debug = LOG.isDebugEnabled();
             for (int i = 0; i < nodeDefinitions.length; i++) {
                 Resource resource = nodeDefinitions[i];
-                if (debug)
+                if (debug) {
                     LOG.debug("adding node type definitions from " + resource.getDescription());
-
-                nodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
+                }
+                try {
+                    nodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
+                } catch (RepositoryException ex) {
+                    LOG.error("Error registering nodetypes ", ex.getCause());
+                }
             }
         }
     }
