@@ -52,11 +52,7 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
         if (!ObjectUtils.isEmpty(nodeDefinitions)) {
             Workspace ws = getSession().getWorkspace();
 
-            // Get the NodeTypeManager from the Workspace.
-            // Note that it must be cast from the generic JCR NodeTypeManager to
-            // the
-            // Jackrabbit-specific implementation.
-            JackrabbitNodeTypeManager nodeTypeManager = (JackrabbitNodeTypeManager) ws.getNodeTypeManager();
+            JackrabbitNodeTypeManager jackrabbitNodeTypeManager = (JackrabbitNodeTypeManager) ws.getNodeTypeManager();
 
             boolean debug = LOG.isDebugEnabled();
             for (int i = 0; i < nodeDefinitions.length; i++) {
@@ -65,7 +61,7 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
                     LOG.debug("adding node type definitions from " + resource.getDescription());
                 }
                 try {
-                    nodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
+                    jackrabbitNodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
                 } catch (RepositoryException ex) {
                     LOG.error("Error registering nodetypes ", ex.getCause());
                 }

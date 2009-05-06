@@ -128,7 +128,6 @@ public class LocalTransactionManagerTest extends TestCase {
                             se.save();
                             throw new RuntimeException();
                         }
-
                     });
                 }
             });

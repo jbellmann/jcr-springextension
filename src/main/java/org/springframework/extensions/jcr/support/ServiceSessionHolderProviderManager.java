@@ -27,9 +27,9 @@ import sun.misc.ServiceConfigurationError;
 
 /**
  * Implementation of SessionHolderProviderManager which does dynamic discovery of the providers using the JDK
- * 1.5+ <a href= "http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> 'Service Provider'
- * specification</a>. The class will look for org.springframework.extensions.jcr.SessionHolderProvider
- * property files in META-INF/services directories.
+ * 1.5+ <a href= "http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> 'Service
+ * Provider' specification</a>. The class will look for
+ * org.springframework.extensions.jcr.SessionHolderProvider property files in META-INF/services directories.
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela

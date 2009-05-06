@@ -23,19 +23,16 @@ import org.springframework.test.AbstractTransactionalSpringContextTests;
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class RmiTest extends AbstractTransactionalSpringContextTests {
 
-	protected String[] getConfigLocations() {
-		return new String[] { "jackrabbitRmiTestApplicationContext.xml" };
-	}
+    protected String[] getConfigLocations() {
+        return new String[] { "jackrabbitRmiTestApplicationContext.xml" };
+    }
 
-	public void testSetup() throws Exception {
-		Repository repository = (Repository) applicationContext
-				.getBean("rmiClient");
-		assertEquals("Jackrabbit", repository
-				.getDescriptor("jcr.repository.name"));
-	}
+    public void testSetup() throws Exception {
+        Repository repository = (Repository) applicationContext.getBean("rmiClient");
+        assertEquals("Jackrabbit", repository.getDescriptor("jcr.repository.name"));
+    }
 
 }
