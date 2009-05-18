@@ -179,7 +179,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         if (LOG.isDebugEnabled())
             LOG.debug("registering custom namespaces " + namespaces);
 
-        NamespaceRegistry registry = getSession().getWorkspace().getNamespaceRegistry();
+        NamespaceRegistry registry = getBareSession().getWorkspace().getNamespaceRegistry();
 
         // do the lookup, so we avoid exceptions
         String[] prefixes = registry.getPrefixes();
@@ -264,6 +264,11 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
                     registry.registerNamespace((String) namespace.getKey(), (String) namespace.getValue());
                 }
         }
+    }
+
+    private Session getBareSession() throws RepositoryException {
+        Session session = repository.login(credentials, workspaceName);
+        return session;
     }
 
     /**
