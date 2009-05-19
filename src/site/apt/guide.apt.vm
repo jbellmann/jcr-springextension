@@ -23,32 +23,22 @@ JSR standard support
 +------+
 
     The only requirement for creating a
-    sessionFactory is the repository (which will be discussed later). There
-    are cases were credentials have to be submitted. One problem that new
-    users have is that
-    <<<javax.jcr.SimpleCredentials>>>
-    requires a char array (char[]) as constructor parameter and not a String
-    and the current Spring distribution (1.2.5) does not contains a
-    <<<PropertyEditor>>> for char arrays. The following
-    examples (taken from the sample) shows how we can use String statical
-    methods to obtain a char array:
+    sessionFactory is the repository bean(which will be discussed later). There
+    are cases were credentials have to be submitted. Users have to use
+    <<<javax.jcr.SimpleCredentials>>> passing Strings as constructor parameters.
+    The following examples (taken from the sample) show how we can use <<<javax.jcr.SimpleCredentials>>>
+    to login into a repository:
 
 +------+
-<bean id="sessionFactory" class="org.springmodules.jcr.JcrSessionFactory">
-  <property name="repository" ref="repository"/>
-  <property name="credentials">
-   <bean class="javax.jcr.SimpleCredentials">
-    <constructor-arg index="0" value="bogus"/>
-    <constructor-arg index="1">
-     <bean factory-bean="password" factory-method="toCharArray"/>
-    </constructor-arg>
-   </bean>
-  </property>
-</bean>
-
-<bean id="password" class="java.lang.String">
-  <constructor-arg index="0" value="pass"/>
-</bean>
+	<bean id="jcrSessionFactory" class="org.springframework.extensions.jcr.JcrSessionFactory">
+		<property name="repository" ref="repository"/>
+		<property name="credentials">
+			<bean class="javax.jcr.SimpleCredentials">
+				<constructor-arg index="0" value="bogus"/>
+				<constructor-arg index="1" value="pass"/>
+			</bean>
+		</property>
+	</bean>
 +------+
 
     Using the static

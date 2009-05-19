@@ -14,7 +14,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 		<property name="credentials">
 			<bean class="javax.jcr.SimpleCredentials">
 				<constructor-arg index="0" value="bogus"/>
-				<!-- create the credentials using a bean factory -->
 				<constructor-arg index="1" value="pass"/>
 			</bean>
 		</property>
