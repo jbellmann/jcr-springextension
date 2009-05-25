@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework</groupId>
 	<artifactId>se-jcr</artifactId>
 	<packaging>jar</packaging>
-	<version>0.9-SNAPSHOT</version>
+	<version>0.9</version>
 	<name>Spring Extension JCR</name>
 	<url>http://www.springsource.org/extensions/se-jcr</url>
 	<licenses>
@@ -16,9 +14,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:https://src.springframework.org/svn/se-jcr/trunk</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/se-jcr/trunk</developerConnection>
-		<url>https://src.springframework.org/svn/se-jcr</url>
+		<connection>scm:svn:https://src.springframework.org/svn/se-jcr/tags/releases/0.9</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/se-jcr/tags/releases/0.9</developerConnection>
+		<url>scm:svn:https://src.springframework.org/svn/se-jcr/tags/releases/0.9</url>
 	</scm>
 	<distributionManagement>
 		<repository>
