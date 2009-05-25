@@ -20,6 +20,13 @@
 		<developerConnection>scm:svn:https://src.springframework.org/svn/se-jcr/trunk</developerConnection>
 		<url>https://src.springframework.org/svn/se-jcr</url>
 	</scm>
+	<distributionManagement>
+		<repository>
+			<id>se-jcr-repo</id>
+			<name>se-jcr-repo</name>
+			<url>svn:https://src.springframework.org/svn/se-jcr/repo</url>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -128,6 +135,12 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.jvnet.wagon-svn</groupId>
+				<artifactId>wagon-svn</artifactId>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -162,10 +175,17 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.0-beta-9</version>
 				<configuration>
-					<tagBase>https://src.springframework.org/svn/se-jcr/tags</tagBase>
+					<tagBase>https://src.springframework.org/svn/se-jcr/tags/releases</tagBase>
 					<scmCommentPrefix>[maven-release-plugin] </scmCommentPrefix>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>java.net-repo</id>
+			<name>java.net-repo</name>
+			<url>http://download.java.net/maven/2/</url>
+		</repository>
+	</repositories>
 </project>
