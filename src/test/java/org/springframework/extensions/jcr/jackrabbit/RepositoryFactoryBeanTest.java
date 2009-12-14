@@ -15,6 +15,8 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean;
 import javax.jcr.Repository;
 
@@ -23,23 +25,23 @@ import junit.framework.TestCase;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
-public class RepositoryFactoryBeanTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+
+public class RepositoryFactoryBeanTest  {
 
 	RepositoryFactoryBean factory;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+    @Before
+	public void setUp() throws Exception {
 		factory = new RepositoryFactoryBean();
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
 
 	/*
 	 * Test method for
 	 * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.resolveConfigurationResource()'
 	 */
+    @Test
 	public void testResolveConfigurationResource() throws Exception {
 
 		factory.resolveConfigurationResource();
@@ -54,6 +56,7 @@ public class RepositoryFactoryBeanTest extends TestCase {
 	 * Test method for
 	 * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.createRepository()'
 	 */
+    @Test
 	public void testCreateRepository() throws Exception {
 		factory.afterPropertiesSet();
 		Repository rep = (Repository) factory.getObject();

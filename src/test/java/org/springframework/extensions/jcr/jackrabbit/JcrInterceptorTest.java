@@ -19,6 +19,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertSame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import javax.transaction.xa.XAResource;
 import junit.framework.TestCase;
 
 import org.apache.jackrabbit.api.XASession;
+import org.junit.Test;
 import org.springframework.extensions.jcr.JcrInterceptor;
 import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionHolder;
@@ -35,12 +37,13 @@ import org.springframework.extensions.jcr.SessionHolderProvider;
 import org.springframework.extensions.jcr.jackrabbit.support.JackRabbitSessionHolderProvider;
 import org.springframework.extensions.jcr.support.ListSessionHolderProviderManager;
 
-public class JcrInterceptorTest extends TestCase {
+public class JcrInterceptorTest {
 
     /*
      * Test method for
      * 'org.springframework.extensions.jcr.jackrabbit.JcrInterceptor.createSessionHolder(Session)'
      */
+    @Test
     public void testCreateSessionHolder() throws Exception {
         final SessionFactory sessionFactory = createMock(SessionFactory.class);
         final XASession xaSession = createMock(XASession.class);

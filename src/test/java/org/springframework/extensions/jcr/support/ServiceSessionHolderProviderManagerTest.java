@@ -15,36 +15,41 @@
  */
 package org.springframework.extensions.jcr.support;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.jcr.SessionHolderProvider;
 import org.springframework.extensions.jcr.support.ServiceSessionHolderProviderManager;
+
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.extensions.jcr.jackrabbit.support.JackRabbitSessionHolderProvider;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class ServiceSessionHolderProviderManagerTest extends TestCase {
+public class ServiceSessionHolderProviderManagerTest {
 
     ServiceSessionHolderProviderManager providerManager;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
+
         providerManager = new ServiceSessionHolderProviderManager();
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     /*
      * Test method for
      * 'org.springframework.extensions.jcr.support.ServiceSessionHolderProviderManager.getProviders()'
      */
+    @Test
     public void testGetProviders() {
         List<SessionHolderProvider> providers = providerManager.getProviders();
         assertEquals(1, providers.size());

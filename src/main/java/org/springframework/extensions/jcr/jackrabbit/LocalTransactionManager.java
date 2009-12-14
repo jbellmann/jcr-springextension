@@ -35,6 +35,7 @@ import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionFactoryUtils;
 import org.springframework.extensions.jcr.SessionHolder;
 import org.springframework.extensions.jcr.jackrabbit.support.UserTxSessionHolder;
+import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
  * PlatformTransactionManager implementation for a single JCR SessionFactory. Binds a Jcr session from the
@@ -49,7 +50,7 @@ import org.springframework.extensions.jcr.jackrabbit.support.UserTxSessionHolder
  * <p>
  * This transaction strategy will typically be used in combination with a single JCR Repository for all JCR
  * access to save resources, typically in a standalone application.
- * @see org.apache.jackrabbit.XASession
+ * @see org.apache.jackrabbit.api.XASession
  * @see javax.jcr.RepositoryException
  * @see org.springframework.transaction.support.AbstractPlatformTransactionManager
  * @author Costin Leau

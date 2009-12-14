@@ -38,7 +38,7 @@ public interface JcrOperations extends JcrOptionalOperations {
      * @return a result object returned by the action, or null
      * @throws org.springframework.dao.DataAccessException in case of Jcr errors
      */
-    public Object execute(JcrCallback action, boolean exposeNativeSession) throws DataAccessException;
+    public <T> T execute(JcrCallback<T> action, boolean exposeNativeSession) throws DataAccessException;
 
     /**
      * Execute the action specified by the given action object within a {@link javax.jcr.Session}. Application
@@ -50,7 +50,7 @@ public interface JcrOperations extends JcrOptionalOperations {
      * repository's default workspace will be used.
      * @param callback the <code>JCRCallback</code> that executes the client operation
      */
-    public Object execute(JcrCallback callback) throws DataAccessException;
+    public <T> T execute(JcrCallback<T> callback) throws DataAccessException;
 
     /**
      * Dump the contents of the given node in a String. This method parses the whole tree under the node and

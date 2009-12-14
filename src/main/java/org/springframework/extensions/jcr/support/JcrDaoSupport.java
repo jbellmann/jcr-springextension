@@ -44,8 +44,8 @@ public abstract class JcrDaoSupport extends DaoSupport {
 	 * Set the JCR SessionFactory to be used by this DAO. Will automatically
 	 * create a JcrTemplate for the given SessionFactory.
 	 * 
-	 * @see #createJcrTemplate
-	 * @see #setJcrTemplate
+	 * @param sessionFactory
+     * @see #setTemplate
 	 */
 	public final void setSessionFactory(SessionFactory sessionFactory) {
 		this.template = new JcrTemplate(sessionFactory);
@@ -53,7 +53,8 @@ public abstract class JcrDaoSupport extends DaoSupport {
 
 	/**
 	 * Return the Jcr SessionFactory used by this DAO.
-	 */
+     * @return
+     */
 	public final SessionFactory getSessionFactory() {
 		return (template != null ? template.getSessionFactory() : null);
 	}
@@ -62,7 +63,8 @@ public abstract class JcrDaoSupport extends DaoSupport {
 	 * Set the JcrTemplate for this DAO explicitly, as an alternative to
 	 * specifying a SessionFactory.
 	 * 
-	 * @see #setSessionFactory
+	 * @param jcrTemplate
+     * @see #setSessionFactory
 	 */
 	public final void setTemplate(JcrTemplate jcrTemplate) {
 		this.template = jcrTemplate;
@@ -71,7 +73,8 @@ public abstract class JcrDaoSupport extends DaoSupport {
 	/**
 	 * Return the JcrTemplate for this DAO, pre-initialized with the
 	 * SessionFactory or set explicitly.
-	 */
+     * @return
+     */
 	public final JcrTemplate getTemplate() {
 		return template;
 	}
@@ -123,10 +126,10 @@ public abstract class JcrDaoSupport extends DaoSupport {
 	 * JCRTemplate.
 	 * 
 	 * @param ex
-	 *            JCRException that occured
+	 *            JCRException that occurred
 	 * @return the corresponding DataAccessException instance
-	 * @see #setJCRTemplate
-	 * @see org.springframework.extensions.jcr.JcrTemplate#convertJCRAccessException
+	 * @see #setTemplate
+	 * @see JcrTemplate#convertJcrAccessException(javax.jcr.RepositoryException)
 	 */
 	protected final DataAccessException convertJcrAccessException(
 			RepositoryException ex) {
@@ -137,9 +140,9 @@ public abstract class JcrDaoSupport extends DaoSupport {
 	 * Close the given JCR Session, created via this DAO's SessionFactory, if it
 	 * isn't bound to the thread.
 	 * 
-	 * @param pm
+	 * @param session
 	 *            Session to close
-	 * @see org.springframework.orm.JCR.SessionFactoryUtils#releaseSession
+	 * @see SessionFactoryUtils#releaseSession
 	 */
 	protected final void releaseSession(Session session) {
 		SessionFactoryUtils.releaseSession(session, getSessionFactory());

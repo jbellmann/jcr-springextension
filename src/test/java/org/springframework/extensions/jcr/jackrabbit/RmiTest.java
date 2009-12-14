@@ -15,21 +15,23 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
+import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
 import javax.jcr.Repository;
 
-import org.springframework.test.AbstractTransactionalSpringContextTests;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class RmiTest extends AbstractTransactionalSpringContextTests {
+@ContextConfiguration(locations = {"classpath:/jackrabbitRmiTestApplicationContext.xml"})
+public class RmiTest extends AbstractJUnit4SpringContextTests {
 
-    protected String[] getConfigLocations() {
-        return new String[] { "jackrabbitRmiTestApplicationContext.xml" };
-    }
-
+    @Test
     public void testSetup() throws Exception {
         Repository repository = (Repository) applicationContext.getBean("rmiClient");
         assertEquals("Jackrabbit", repository.getDescriptor("jcr.repository.name"));

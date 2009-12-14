@@ -153,6 +153,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * Hook for registering node types on the underlying repository. Since this process is not covered by the
      * spec, each implementation requires its own subclass. By default, this method doesn't do anything.
+     * @throws Exception
      */
     protected void registerNodeTypes() throws Exception {
         // do nothing
@@ -161,6 +162,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * Hook for un-registering node types on the underlying repository. Since this process is not covered by
      * the spec, each implementation requires its own subclass. By default, this method doesn't do anything.
+     * @throws Exception
      */
     protected void unregisterNodeTypes() throws Exception {
         // do nothing
@@ -168,8 +170,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
 
     /**
      * Register the namespaces.
-     * @param session
-     * @throws RepositoryException
+     * @throws Exception
      */
     protected void registerNamespaces() throws Exception {
 
@@ -179,7 +180,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         if (LOG.isDebugEnabled())
             LOG.debug("registering custom namespaces " + namespaces);
 
-        NamespaceRegistry registry = getBareSession().getWorkspace().getNamespaceRegistry();
+        Session session = getBareSession();
+        NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
 
         // do the lookup, so we avoid exceptions
         String[] prefixes = registry.getPrefixes();
@@ -193,7 +195,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
             if (!keepNewNamespaces)
                 overwrittenNamespaces = new HashMap<String, String>(namespaces.size());
 
-            // search occurences
+            // search occurrences
             for (Object key : namespaces.keySet()) {
                 String prefix = (String) key;
                 int position = Arrays.binarySearch(prefixes, prefix);
@@ -214,8 +216,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         // do the registration
         for (Map.Entry entry : namespaces.entrySet()) {
             Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
-            String prefix = (String) namespace.getKey();
-            String ns = (String) namespace.getValue();
+            String prefix = namespace.getKey();
+            String ns = namespace.getValue();
 
             int position = Arrays.binarySearch(prefixes, prefix);
 
@@ -226,6 +228,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
                 registry.registerNamespace(prefix, ns);
             }
         }
+
+        session.logout();
     }
 
     /**
@@ -238,7 +242,6 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
 
     /**
      * Removes the namespaces.
-     * @param session
      */
     protected void unregisterNamespaces() throws Exception {
 
@@ -260,13 +263,13 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
                 LOG.debug("reverting back overwritten namespaces " + overwrittenNamespaces);
             if (overwrittenNamespaces != null)
                 for (Map.Entry<String, String> entry : overwrittenNamespaces.entrySet()) {
-                    Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
-                    registry.registerNamespace((String) namespace.getKey(), (String) namespace.getValue());
+                    Map.Entry<String, String> namespace = entry;
+                    registry.registerNamespace(namespace.getKey(), namespace.getValue());
                 }
         }
     }
 
-    private Session getBareSession() throws RepositoryException {
+    protected Session getBareSession() throws RepositoryException {
         Session session = repository.login(credentials, workspaceName);
         return session;
     }
@@ -291,6 +294,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
      * reply on the template.
      * @param session JCR session
      * @return the listened session
+     * @throws javax.jcr.RepositoryException
      */
     protected Session addListeners(Session session) throws RepositoryException {
         if (eventListeners != null && eventListeners.length > 0) {

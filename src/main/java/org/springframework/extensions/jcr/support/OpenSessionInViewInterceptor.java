@@ -79,8 +79,8 @@ public class OpenSessionInViewInterceptor extends HandlerInterceptorAdapter impl
             // accordingly
             String participateAttributeName = getParticipateAttributeName();
             Integer count = (Integer) request.getAttribute(participateAttributeName);
-            int newCount = (count != null) ? count.intValue() + 1 : 1;
-            request.setAttribute(getParticipateAttributeName(), new Integer(newCount));
+            int newCount = (count != null) ? count + 1 : 1;
+            request.setAttribute(getParticipateAttributeName(), newCount);
         }
 
         else {
@@ -98,8 +98,8 @@ public class OpenSessionInViewInterceptor extends HandlerInterceptorAdapter impl
         Integer count = (Integer) request.getAttribute(participateAttributeName);
         if (count != null) {
             // do not modify the Session: just clear the marker
-            if (count.intValue() > 1) {
-                request.setAttribute(participateAttributeName, new Integer(count.intValue() - 1));
+            if (count > 1) {
+                request.setAttribute(participateAttributeName, count - 1);
             } else {
                 request.removeAttribute(participateAttributeName);
             }

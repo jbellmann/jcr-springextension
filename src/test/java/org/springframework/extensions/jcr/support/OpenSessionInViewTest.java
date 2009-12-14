@@ -21,6 +21,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 
@@ -32,6 +33,7 @@ import javax.servlet.ServletResponse;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionHolder;
 import org.springframework.mock.web.MockFilterConfig;
@@ -47,8 +49,9 @@ import org.springframework.web.context.support.StaticWebApplicationContext;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class OpenSessionInViewTest extends TestCase {
+public class OpenSessionInViewTest {
 
+    @Test
     public void testOpenSessionInViewInterceptor() throws Exception {
         final SessionFactory sessionFactory = createMock(SessionFactory.class);
         final Session session = createMock(Session.class);
@@ -214,10 +217,7 @@ public class OpenSessionInViewTest extends TestCase {
         assertFalse(TransactionSynchronizationManager.hasResource(sessionFactory2));
         assertNotNull(request.getAttribute("invoked"));
 
-        verify(sessionFactory);
-        verify(session);
-        verify(sessionFactory2);
-        verify(session2);
+        verify(sessionFactory, session, sessionFactory2, session2);
 
         wac.close();
     }

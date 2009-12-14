@@ -61,6 +61,7 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
     /**
      * Set the bean name of the SessionFactory to fetch from Spring's root application context. Default is
      * "SessionFactory".
+     * @param SessionFactoryBeanName
      * @see #DEFAULT_JCR_SESSION_FACTORY_FACTORY_BEAN_NAME
      */
     public void setSessionFactoryBeanName(String SessionFactoryBeanName) {
@@ -69,6 +70,7 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
 
     /**
      * Return the bean name of the SessionFactory to fetch from Spring's root application context.
+     * @return
      */
     protected String getSessionFactoryBeanName() {
         return SessionFactoryBeanName;
@@ -108,6 +110,7 @@ public class OpenSessionInViewFilter extends OncePerRequestFilter {
      * Look up the SessionFactory that this filter should use, taking the current HTTP request as argument.
      * <p>
      * Default implementation delegates to the <code>lookupSessionFactory</code> without arguments.
+     * @param request
      * @return the SessionFactory to use
      * @see #lookupSessionFactory()
      */

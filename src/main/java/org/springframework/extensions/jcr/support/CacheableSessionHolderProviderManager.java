@@ -55,7 +55,7 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
 
     /**
      * Method for retrieving the parent functionality.
-     * @param sf
+     * @param repository
      * @return
      */
     private SessionHolderProvider parentLookup(Repository repository) {

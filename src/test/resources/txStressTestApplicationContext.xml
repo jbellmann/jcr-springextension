@@ -14,6 +14,8 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<import resource="commonApplicationContext.xml" />
 
+    <alias name="jcrTransactionManager" alias="transactionManager"/>
+    
 	<bean id="repository"
 		class="org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean">
 		<!-- normal factory beans params -->

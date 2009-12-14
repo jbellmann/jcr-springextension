@@ -19,6 +19,8 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.classextension.EasyMock.replay;
 import static org.easymock.classextension.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
@@ -26,6 +28,9 @@ import javax.jcr.Session;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.jcr.JcrTemplate;
 import org.springframework.extensions.jcr.SessionFactory;
 
@@ -34,14 +39,15 @@ import org.springframework.extensions.jcr.SessionFactory;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class JcrDaoSupportTest extends TestCase {
+public class JcrDaoSupportTest {
 
     private SessionFactory sessionFactory;
     private Session session;
     private Repository repository;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
+
         sessionFactory = createMock(SessionFactory.class);
 
         session = createMock(Session.class);
@@ -49,25 +55,21 @@ public class JcrDaoSupportTest extends TestCase {
 
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {
         try {
-            verify(session);
-            verify(sessionFactory);
-            verify(repository);
+            verify(session, sessionFactory, repository);
         } catch (IllegalStateException ex) {
             // ignore: test method didn't call replay
         }
     }
 
+    @Test
     public void testJcrDaoSupportWithSessionFactory() throws Exception {
 
-        replay(sessionFactory);
-        replay(session);
+        replay(sessionFactory, session);
 
-        JcrDaoSupport dao = new JcrDaoSupport() {
-        };
+        JcrDaoSupport dao = new JcrDaoSupport(){};
 
         dao.setSessionFactory(sessionFactory);
         dao.afterPropertiesSet();
@@ -75,6 +77,7 @@ public class JcrDaoSupportTest extends TestCase {
         verify(sessionFactory);
     }
 
+    @Test
     public void testJcrDaoSupportWithJcrTemplate() throws Exception {
 
         JcrTemplate template = new JcrTemplate();
@@ -86,6 +89,7 @@ public class JcrDaoSupportTest extends TestCase {
         assertEquals("Correct JcrTemplate", template, dao.getTemplate());
     }
 
+    @Test
     public void testAfterPropertiesSet() {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };
@@ -98,6 +102,7 @@ public class JcrDaoSupportTest extends TestCase {
         }
     }
 
+    @Test
     public void testSetSessionFactory() throws RepositoryException {
         // sessCtrl.expectAndReturn(sess.getRepository(), repository,
         // MockControl.ONE_OR_MORE);
@@ -113,6 +118,7 @@ public class JcrDaoSupportTest extends TestCase {
         assertEquals(dao.getSessionFactory(), sessionFactory);
     }
 
+    @Test
     public void testGetSession() throws RepositoryException {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };
@@ -133,6 +139,7 @@ public class JcrDaoSupportTest extends TestCase {
         assertEquals(dao.getSession(true), session);
     }
 
+    @Test
     public void testReleaseSession() {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };
@@ -149,6 +156,7 @@ public class JcrDaoSupportTest extends TestCase {
         dao.releaseSession(session);
     }
 
+    @Test 
     public void testConvertException() {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };

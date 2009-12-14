@@ -141,7 +141,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
      * functionality of thread-bound session but without the tx support. Such an option exists because
      * transaction support is optional for JSR-170 implementations.
      * <p>
-     * Default is "true". Can be turned off to enforce only transactional Sessionss, which safely allows for
+     * Default is "true". Can be turned off to enforce only transactional Sessions, which safely allows for
      * DAOs written to get a Session without explicit closing (i.e. a <code>Session.login()</code> call
      * without corresponding <code>Session.logout()</code> call).
      * @param allowNonTxRepository The allowNonTxRepository to set.
@@ -153,6 +153,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
     /**
      * Set the target JCR Repository that this proxy should delegate to wrapped in a JcrSessionFactory object
      * along with the credentials and workspace.
+     * @param target
      */
     public void setTargetFactory(JcrSessionFactory target) {
         this.sessionFactory = target;
@@ -161,6 +162,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
 
     /**
      * Return the target JCR Repository that this proxy delegates to.
+     * @return
      */
     public Repository getTargetRepository() {
         return this.sessionFactory.getRepository();
@@ -209,7 +211,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
                 return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
             } else if (method.getName().equals("hashCode")) {
                 // Use hashCode of Repository proxy.
-                return new Integer(hashCode());
+                return hashCode();
             }
 
             Repository target = getTargetRepository();
@@ -245,7 +247,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
                 return (proxy == args[0] ? Boolean.TRUE : Boolean.FALSE);
             } else if (method.getName().equals("hashCode")) {
                 // Use hashCode of Session proxy.
-                return new Integer(hashCode());
+                return hashCode();
             } else if (method.getName().equals("logout")) {
                 // Handle close method: only close if not within a transaction.
                 if (this.sessionFactory != null) {

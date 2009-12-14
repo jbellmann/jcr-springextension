@@ -15,54 +15,65 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import java.io.IOException;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.extensions.jcr.JcrCallback;
+import org.springframework.extensions.jcr.JcrTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-
-import org.springframework.test.AbstractTransactionalSpringContextTests;
-import org.springframework.extensions.jcr.JcrCallback;
-import org.springframework.extensions.jcr.JcrTemplate;
+import java.io.IOException;
 
 /**
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class TxStressTest extends AbstractTransactionalSpringContextTests {
+@TestExecutionListeners(TransactionalTestExecutionListener.class)
+@ContextConfiguration(locations = {"classpath:txStressTestApplicationContext.xml"})
+public class TxStressTest extends AbstractJUnit4SpringContextTests {
 
     private JcrTemplate template;
 
-    protected String[] getConfigLocations() {
-        return new String[] { "txStressTestApplicationContext.xml" };
-    }
 
+    @Test
     public void testMultipleCommits() {
         for (int i = 0; i < 100; i++) {
-            endTransaction();
-            startNewTransaction();
-            template.execute(new JcrCallback() {
-
-                public Object doInJcr(Session session) throws IOException, RepositoryException {
-                    Node rootNode = session.getRootNode();
-                    Node one = rootNode.addNode("bla-bla-bla");
-                    one.setProperty("some prop", false);
-                    Node two = one.addNode("foo");
-                    two.setProperty("boo", "hoo");
-                    Node three = two.addNode("bar");
-                    three.setProperty("whitehorse", new String[] { "super", "ultra", "mega" });
-                    session.save();
-                    return null;
-                }
-            });
-            setComplete();
-            endTransaction();
+//            endTransaction();
+//            startNewTransaction();
+            transactionalMethod();
+//            setComplete();
+//            endTransaction();
 
         }
-
     }
 
+    @Transactional
+    private void transactionalMethod() {
+
+        template.execute(new JcrCallback<Void>() {
+
+            public Void doInJcr(Session session) throws IOException, RepositoryException {
+                Node rootNode = session.getRootNode();
+                Node one = rootNode.addNode("bla-bla-bla");
+                one.setProperty("some prop", false);
+                Node two = one.addNode("foo");
+                two.setProperty("boo", "hoo");
+                Node three = two.addNode("bar");
+                three.setProperty("whitehorse", new String[]{"super", "ultra", "mega"});
+                session.save();
+                return null;
+            }
+        });
+    }
+
+    @Autowired
     public void setTemplate(JcrTemplate template) {
         this.template = template;
     }

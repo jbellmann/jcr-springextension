@@ -16,6 +16,7 @@
 package org.springframework.extensions.jcr.support;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertSame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,8 @@ import javax.jcr.Session;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionHolder;
 import org.springframework.extensions.jcr.SessionHolderProvider;
@@ -34,18 +37,18 @@ import org.springframework.extensions.jcr.SessionHolderProvider;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class AbstractSessionHolderProviderManagerTest extends TestCase {
+public class AbstractSessionHolderProviderManagerTest {
 
-    AbstractSessionHolderProviderManager providerManager;
-    List<SessionHolderProvider> providers;
-    String repositoryName;
-    Session session;
-    Repository repository;
-    SessionFactory sessionfactory;
-    SessionHolderProvider customProvider;
+    private AbstractSessionHolderProviderManager providerManager;
+    private List<SessionHolderProvider> providers;
+    private String repositoryName;
+    private Session session;
+    private Repository repository;
+    private SessionFactory sessionfactory;
+    private SessionHolderProvider customProvider;
 
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
 
         providers = new ArrayList<SessionHolderProvider>();
         repositoryName = "dummyRepository";
@@ -82,24 +85,19 @@ public class AbstractSessionHolderProviderManagerTest extends TestCase {
     }
 
     protected void tearDown() throws Exception {
-        verify(sessionfactory);
-        verify(session);
-        verify(repository);
-
-        super.tearDown();
+        verify(sessionfactory, session, repository);
     }
 
     /*
      * Default provider is used even on empty list. Test method for
      * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
      */
+    @Test
     public void testDefaultSessionProvider() {
         // sanity check
         assertSame(providers, providerManager.getProviders());
 
-        replay(sessionfactory);
-        replay(session);
-        replay(repository);
+        replay(sessionfactory, session, repository);
 
         SessionHolderProvider provider = providerManager.getSessionProvider(repository);
         assertSame(GenericSessionHolderProvider.class, provider.getClass());
@@ -109,14 +107,13 @@ public class AbstractSessionHolderProviderManagerTest extends TestCase {
      * Make sure that the approapriate provider is selected Test method for
      * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
      */
+    @Test
     public void testCustomSessionProvider() {
         // sanity check
         providers = new ArrayList<SessionHolderProvider>();
         providers.add(customProvider);
 
-        replay(sessionfactory);
-        replay(session);
-        replay(repository);
+        replay(sessionfactory, session, repository);
 
         assertSame(customProvider, providerManager.getSessionProvider(repository));
     }
@@ -125,6 +122,7 @@ public class AbstractSessionHolderProviderManagerTest extends TestCase {
      * Make sure that we fallback to default provider Test method for
      * 'org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager.getSessionProvider(SessionFactory)'
      */
+    @Test
     public void testDifferentSessionProvider() {
         // sanity check
 
@@ -148,9 +146,7 @@ public class AbstractSessionHolderProviderManagerTest extends TestCase {
         providers = new ArrayList<SessionHolderProvider>();
         providers.add(customProvider);
 
-        replay(sessionfactory);
-        replay(session);
-        replay(repository);
+        replay(sessionfactory, session, repository);
 
         assertSame(GenericSessionHolderProvider.class, providerManager.getSessionProvider(repository).getClass());
     }

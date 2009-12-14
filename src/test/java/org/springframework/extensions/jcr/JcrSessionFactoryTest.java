@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,23 +35,27 @@ import javax.jcr.observation.ObservationManager;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.extensions.jcr.support.ListSessionHolderProviderManager;
 
-public class JcrSessionFactoryTest extends TestCase {
+public class JcrSessionFactoryTest {
 
     private JcrSessionFactory factory;
 
     private Repository repository;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        repository = (Repository) createMock(Repository.class);
+    @Before
+    public void setUp() throws Exception {
+
+        repository = createMock(Repository.class);
         factory = new JcrSessionFactory();
         factory.setRepository(repository);
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
 
         try {
             verify(repository);
@@ -65,6 +70,7 @@ public class JcrSessionFactoryTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrSessionFactory.getSession()'
      */
+    @Test
     public void testGetSession() {
         try {
 
@@ -78,6 +84,7 @@ public class JcrSessionFactoryTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrSessionFactory.afterPropertiesSet'
      */
+    @Test
     public void testAfterPropertiesSet() throws Exception {
         try {
             factory.setRepository(null);
@@ -87,6 +94,7 @@ public class JcrSessionFactoryTest extends TestCase {
         }
     }
 
+    @Test
     public void testConstructor() {
         factory = new JcrSessionFactory(repository, "ws", null);
         assertEquals(repository, factory.getRepository());
@@ -97,6 +105,7 @@ public class JcrSessionFactoryTest extends TestCase {
         assertEquals(factory.getWorkspaceName(), "ws");
     }
 
+    @Test
     public void testEquals() {
         assertEquals(factory.hashCode(), repository.hashCode() + 17 * 37);
         assertFalse(factory.equals(null));
@@ -104,14 +113,14 @@ public class JcrSessionFactoryTest extends TestCase {
 
         Repository repo2 = createNiceMock(Repository.class);
 
-        replay(repo2);
-        replay(repository);
+        replay(repo2, repository);
 
         JcrSessionFactory fact2 = new JcrSessionFactory();
         fact2.setRepository(repo2);
         assertFalse(factory.equals(fact2));
     }
 
+    @Test
     public void testAddListeners() throws RepositoryException {
         EventListenerDefinition def1 = new EventListenerDefinition();
         EventListenerDefinition def2 = new EventListenerDefinition();
@@ -133,22 +142,17 @@ public class JcrSessionFactoryTest extends TestCase {
         observationManager.addEventListener(def1.getListener(), def1.getEventTypes(), def1.getAbsPath(), def1.isDeep(), def1.getUuid(), def1.getNodeTypeName(), def1.isNoLocal());
         observationManager.addEventListener(def2.getListener(), def2.getEventTypes(), def2.getAbsPath(), def2.isDeep(), def2.getUuid(), def2.getNodeTypeName(), def2.isNoLocal());
 
-        replay(repository);
-        replay(session);
-        replay(workspace);
-        replay(observationManager);
+        replay(repository, session, workspace, observationManager);
 
         // coverage madness
         assertSame(listeners, factory.getEventListeners());
         Session sess = factory.getSession();
         assertSame(session, sess);
 
-        verify(repository);
-        verify(session);
-        verify(workspace);
-        verify(observationManager);
+        verify(repository, session, workspace, observationManager);
     }
 
+    @Test
     public void testRegisterNamespaces() throws Exception {
         Properties namespaces = new Properties();
         namespaces.put("foo", "bar");
@@ -173,21 +177,19 @@ public class JcrSessionFactoryTest extends TestCase {
         namespaceRegistry.registerNamespace("foo", "bar");
         namespaceRegistry.registerNamespace("hocus", "pocus");
 
-        replay(namespaceRegistry);
-        replay(workspace);
-        replay(session);
-        replay(repository);
+        session.logout();
+
+        replay(namespaceRegistry, workspace, session, repository);
 
         factory.afterPropertiesSet();
 
         factory.destroy();
 
-        verify(namespaceRegistry);
-        verify(workspace);
-        verify(session);
+        verify(namespaceRegistry, workspace, session);
 
     }
 
+    @Test
     public void testForceRegistryNamespace() throws Exception {
         String foo = "foo";
         Properties namespaces = new Properties();
@@ -220,6 +222,9 @@ public class JcrSessionFactoryTest extends TestCase {
         String oldURI = "old bar";
         expect(namespaceRegistry.getPrefixes()).andReturn(prefixes);
         expect(namespaceRegistry.getURI(foo)).andReturn(oldURI);
+
+        session.logout();
+
         namespaceRegistry.unregisterNamespace(foo);
 
         namespaceRegistry.registerNamespace(foo, "bar");
@@ -229,19 +234,15 @@ public class JcrSessionFactoryTest extends TestCase {
         namespaceRegistry.unregisterNamespace("hocus");
         namespaceRegistry.registerNamespace(foo, oldURI);
 
-        replay(namespaceRegistry);
-        replay(workspace);
-        replay(session);
-        replay(repository);
+        replay(namespaceRegistry, workspace, session, repository);
 
         factory.afterPropertiesSet();
         factory.destroy();
 
-        verify(namespaceRegistry);
-        verify(workspace);
-        verify(session);
+        verify(namespaceRegistry, workspace, session);
     }
 
+    @Test
     public void testKeepRegistryNamespace() throws Exception {
         Properties namespaces = new Properties();
         namespaces.put("foo", "bar");
@@ -266,20 +267,18 @@ public class JcrSessionFactoryTest extends TestCase {
         namespaceRegistry.registerNamespace("foo", "bar");
         namespaceRegistry.registerNamespace("hocus", "pocus");
 
-        replay(namespaceRegistry);
-        replay(workspace);
-        replay(session);
-        replay(repository);
+        session.logout();
+        
+        replay(namespaceRegistry, workspace, session, repository);
 
         factory.afterPropertiesSet();
 
         factory.destroy();
 
-        verify(namespaceRegistry);
-        verify(workspace);
-        verify(session);
+        verify(namespaceRegistry, workspace, session);
     }
 
+    @Test
     public void testSkipRegisteredNamespaces() throws Exception {
         Properties namespaces = new Properties();
         namespaces.put("foo", "bar");
@@ -302,21 +301,20 @@ public class JcrSessionFactoryTest extends TestCase {
         namespaceRegistry.registerNamespace("foo", "bar");
         namespaceRegistry.registerNamespace("hocus", "pocus");
 
+        session.logout();
+        
         expect(namespaceRegistry.getPrefixes()).andReturn(new String[0]);
-        replay(namespaceRegistry);
-        replay(workspace);
-        replay(session);
-        replay(repository);
+
+        replay(namespaceRegistry, workspace, session, repository);
 
         factory.afterPropertiesSet();
 
         factory.destroy();
 
-        verify(namespaceRegistry);
-        verify(workspace);
-        verify(session);
+        verify(namespaceRegistry, workspace, session);
     }
 
+    @Test
     public void testDefaultSesionHolder() throws Exception {
         factory.afterPropertiesSet();
         Session session = factory.getSession();
@@ -326,6 +324,7 @@ public class JcrSessionFactoryTest extends TestCase {
         assertSame(SessionHolder.class, factory.getSessionHolder(null).getClass());
     }
 
+    @Test
     public void testSessionHolder() throws Exception {
         final String REPO_NAME = "hocus_pocus";
 
@@ -335,8 +334,7 @@ public class JcrSessionFactoryTest extends TestCase {
 
         expect(repository.login(null, null)).andReturn(session);
 
-        replay(repository);
-        replay(session);
+        replay(repository, session);
 
         List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
 
@@ -368,8 +366,7 @@ public class JcrSessionFactoryTest extends TestCase {
         assertSame(session, sess);
         assertSame(CustomSessionHolder.class, factory.getSessionHolder(sess).getClass());
 
-        verify(repository);
-        verify(session);
+        verify(repository, session);
     }
 
     /**

@@ -53,6 +53,11 @@ import javax.jcr.version.VersionException;
 import junit.framework.TestCase;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -66,14 +71,15 @@ import org.xml.sax.ContentHandler;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class JcrTemplateTest extends TestCase {
+public class JcrTemplateTest {
 
     private SessionFactory sessionFactory;
     private Repository repository;
     private Session session;
     private JcrTemplate jcrTemplate;
 
-    protected void setUp() throws RepositoryException {
+    @Before
+    public void setUp() throws RepositoryException {
 
         sessionFactory = createMock(SessionFactory.class);
         session = createMock(Session.class);
@@ -97,7 +103,8 @@ public class JcrTemplateTest extends TestCase {
 
     }
 
-    protected void tearDown() {
+    @After
+    public void tearDown() {
         try {
             verify(session);
             verify(sessionFactory);
@@ -107,6 +114,7 @@ public class JcrTemplateTest extends TestCase {
         }
     }
 
+    @Test
     public void testAfterPropertiesSet() {
 
         try {
@@ -119,6 +127,7 @@ public class JcrTemplateTest extends TestCase {
 
     }
 
+    @Test
     public void testInvocationHandler() {
         expect(session.getAttribute("smth")).andReturn(null);
         replay(session);
@@ -127,8 +136,8 @@ public class JcrTemplateTest extends TestCase {
         jcrTemplate.setAllowCreate(true);
         jcrTemplate.setExposeNativeSession(true);
 
-        jcrTemplate.execute(new JcrCallback() {
-            public Object doInJcr(Session sess) throws RepositoryException {
+        jcrTemplate.execute(new JcrCallback<Void>() {
+            public Void doInJcr(Session sess) throws RepositoryException {
                 assertFalse(sess.hashCode() == session.hashCode());
                 assertEquals(sess, sess);
                 assertFalse(sess.equals(null));
@@ -142,11 +151,12 @@ public class JcrTemplateTest extends TestCase {
 
     }
 
+    @Test
     public void testTemplateExecuteWithNotAllowCreate() {
         jcrTemplate.setAllowCreate(false);
         try {
-            jcrTemplate.execute(new JcrCallback() {
-                public Object doInJcr(Session session) {
+            jcrTemplate.execute(new JcrCallback<Void>() {
+                public Void doInJcr(Session session) {
                     return null;
                 }
             });
@@ -157,19 +167,19 @@ public class JcrTemplateTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testTemplateExecuteWithNotAllowCreateAndThreadBound() {
         reset(sessionFactory);
         reset(session);
 
-        replay(sessionFactory);
-        replay(session);
+        replay(sessionFactory, session);
 
         jcrTemplate.setAllowCreate(false);
         TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
         final List<String> testList = new ArrayList<String>();
         testList.add("test");
-        List<String> result = (List<String>) jcrTemplate.execute(new JcrCallback() {
-            public Object doInJcr(Session session) {
+        List<String> result = jcrTemplate.execute(new JcrCallback<List<String>>() {
+            public List<String> doInJcr(Session session) {
                 return testList;
             }
         });
@@ -178,6 +188,7 @@ public class JcrTemplateTest extends TestCase {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testTemplateExecuteWithNewSession() {
         replay(sessionFactory);
         replay(session);
@@ -186,8 +197,8 @@ public class JcrTemplateTest extends TestCase {
 
         final List<String> testList = new ArrayList<String>();
         testList.add("test");
-        List<String> result = (List<String>) jcrTemplate.execute(new JcrCallback() {
-            public Object doInJcr(Session session) {
+        List<String> result = (List<String>) jcrTemplate.execute(new JcrCallback<List<String>>() {
+            public List<String> doInJcr(Session session) {
                 return testList;
             }
         });
@@ -197,7 +208,7 @@ public class JcrTemplateTest extends TestCase {
     public void testTemplateExceptions() throws RepositoryException {
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new AccessDeniedException();
                 }
@@ -208,7 +219,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new ConstraintViolationException();
                 }
@@ -219,7 +230,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new InvalidItemStateException();
                 }
@@ -230,7 +241,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new InvalidQueryException();
                 }
@@ -241,7 +252,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new ItemExistsException();
                 }
@@ -252,7 +263,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new ItemNotFoundException();
                 }
@@ -263,7 +274,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new LockException();
                 }
@@ -273,7 +284,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new NamespaceException();
                 }
@@ -283,7 +294,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new NoSuchNodeTypeException();
                 }
@@ -293,7 +304,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new NoSuchWorkspaceException();
                 }
@@ -303,7 +314,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new PathNotFoundException();
                 }
@@ -313,7 +324,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new ReferentialIntegrityException();
                 }
@@ -323,7 +334,7 @@ public class JcrTemplateTest extends TestCase {
             // expected
         }
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new UnsupportedRepositoryOperationException();
                 }
@@ -334,7 +345,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new ValueFormatException();
                 }
@@ -345,7 +356,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new VersionException();
                 }
@@ -356,7 +367,7 @@ public class JcrTemplateTest extends TestCase {
         }
 
         try {
-            createTemplate().execute(new JcrCallback() {
+            createTemplate().execute(new JcrCallback<Object>() {
                 public Object doInJcr(Session session) throws RepositoryException {
                     throw new RepositoryException();
                 }
@@ -386,6 +397,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.addLockToken(String)'
      */
+    @Test
     public void testAddLockToken() {
 
         String lock = "some lock";
@@ -401,6 +413,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getAttribute(String)'
      */
+    @Test
     public void testGetAttribute() {
         String attr = "attribute";
         Object result = new Object();
@@ -415,8 +428,9 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getAttributeNames()'
      */
+    @Test
     public void testGetAttributeNames() {
-        String result[] = { "some node" };
+        String result[] = {"some node"};
         expect(session.getAttributeNames()).andReturn(result);
         replay(session);
         replay(sessionFactory);
@@ -427,6 +441,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getImportContentHandler(String, int)'
      */
+    @Test
     public void testGetImportContentHandler() throws RepositoryException {
         String path = "path";
         ContentHandler result = createMock(ContentHandler.class);
@@ -442,6 +457,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getItem(String)'
      */
+    @Test
     public void testGetItem() throws RepositoryException {
         String path = "path";
         Item result = createMock(Item.class);
@@ -457,8 +473,9 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getLockTokens()'
      */
+    @Test
     public void testGetLockTokens() {
-        String result[] = { "lock1", "lock2" };
+        String result[] = {"lock1", "lock2"};
 
         expect(session.getLockTokens()).andReturn(result);
         replay(session);
@@ -470,6 +487,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getNamespacePrefix(String)'
      */
+    @Test
     public void testGetNamespacePrefix() throws RepositoryException {
         String result = "namespace";
         String uri = "prefix";
@@ -484,8 +502,9 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getNamespacePrefixes()'
      */
+    @Test
     public void testGetNamespacePrefixes() throws RepositoryException {
-        String result[] = { "prefix1", "prefix2" };
+        String result[] = {"prefix1", "prefix2"};
 
         expect(session.getNamespacePrefixes()).andReturn(result);
         replay(session);
@@ -497,6 +516,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getNamespaceURI(String)'
      */
+    @Test
     public void testGetNamespaceURI() throws RepositoryException {
         String result = "namespace";
         String prefix = "prefix";
@@ -511,6 +531,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getNodeByUUID(String)'
      */
+    @Test
     public void testGetNodeByUUID() throws RepositoryException {
         Node result = createMock(Node.class);
 
@@ -526,6 +547,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getUserID()'
      */
+    @Test
     public void testGetUserID() {
         String result = "userid";
 
@@ -539,6 +561,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.getValueFactory()'
      */
+    @Test
     public void testGetValueFactory() throws RepositoryException {
         ValueFactory result = createMock(ValueFactory.class);
 
@@ -552,6 +575,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.hasPendingChanges()'
      */
+    @Test
     public void testHasPendingChanges() throws RepositoryException {
         boolean result = true;
 
@@ -565,6 +589,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.importXML(String, InputStream, int)'
      */
+    @Test
     public void testImportXML() throws RepositoryException, IOException {
         String path = "path";
         InputStream stream = new ByteArrayInputStream(new byte[0]);
@@ -579,6 +604,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.refresh(boolean)'
      */
+    @Test
     public void testRefresh() throws RepositoryException {
         boolean refreshMode = true;
 
@@ -593,6 +619,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.removeLockToken(String)'
      */
+    @Test
     public void testRemoveLockToken() {
         String lock = "lock";
         session.removeLockToken(lock);
@@ -606,6 +633,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.setNamespacePrefix(String, String)'
      */
+    @Test
     public void testSetNamespacePrefix() throws RepositoryException {
         String prefix = "prefix";
         String uri = "uri";
@@ -620,6 +648,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.isLive()'
      */
+    @Test
     public void testIsLive() {
         boolean result = true;
 
@@ -633,6 +662,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.itemExists(String)'
      */
+    @Test
     public void testItemExists() throws RepositoryException {
         boolean result = true;
         String path = "path";
@@ -647,6 +677,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.move(String, String)'
      */
+    @Test
     public void testMove() throws RepositoryException {
         String src = "src";
         String dest = "dest";
@@ -661,6 +692,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.save()'
      */
+    @Test
     public void testSave() throws RepositoryException {
         session.save();
         replay(session);
@@ -672,6 +704,7 @@ public class JcrTemplateTest extends TestCase {
     /*
      * Test method for 'org.springframework.extensions.jcr.JcrTemplate.dump(Node)'
      */
+    @Test
     public void testDumpNode() throws RepositoryException {
 
         Node node = createNiceMock(Node.class);
@@ -695,6 +728,7 @@ public class JcrTemplateTest extends TestCase {
         verify(node);
     }
 
+    @Test
     public void testQueryNode() throws RepositoryException {
         try {
             jcrTemplate.query((Node) null);
@@ -718,23 +752,14 @@ public class JcrTemplateTest extends TestCase {
         expect(qm.getQuery(nd)).andReturn(query);
         expect(query.execute()).andReturn(result);
 
-        replay(sessionFactory);
-        replay(session);
-        replay(ws);
-        replay(qm);
-        replay(query);
-        replay(result);
+        replay(sessionFactory, session, ws, qm, query, result);
 
         assertSame(result, jcrTemplate.query(nd));
 
-        verify(sessionFactory);
-        verify(session);
-        verify(ws);
-        verify(qm);
-        verify(query);
-        verify(result);
+        verify(sessionFactory, session, ws, qm, query, result);
     }
 
+    @Test
     public void testExecuteQuery() throws RepositoryException {
         try {
             jcrTemplate.query(null, null);
@@ -756,23 +781,14 @@ public class JcrTemplateTest extends TestCase {
         expect(queryManager.createQuery(stmt, language)).andReturn(query);
         expect(query.execute()).andReturn(result);
 
-        replay(sessionFactory);
-        replay(session);
-        replay(workspace);
-        replay(queryManager);
-        replay(query);
-        replay(result);
+        replay(sessionFactory, session, workspace, queryManager, query, result);
 
         assertSame(result, jcrTemplate.query(stmt, null));
 
-        verify(sessionFactory);
-        verify(session);
-        verify(workspace);
-        verify(queryManager);
-        verify(query);
-        verify(result);
+        verify(sessionFactory, session, workspace, queryManager, query, result);
     }
 
+    @Test
     public void testExecuteQuerySimple() throws RepositoryException {
         try {
             jcrTemplate.query((String) null);
@@ -784,6 +800,7 @@ public class JcrTemplateTest extends TestCase {
 
     }
 
+    @Test
     public void testGetTree() throws RepositoryException {
         try {
             jcrTemplate.query((List) null);
@@ -814,23 +831,13 @@ public class JcrTemplateTest extends TestCase {
         expect(query.execute()).andReturn(result);
         expect(query.execute()).andReturn(result);
 
-        replay(sessionFactory);
-        replay(session);
-        replay(workspace);
-        replay(queryManager);
-        replay(query);
-        replay(result);
+        replay(sessionFactory, session, workspace, queryManager, query, result);
 
         Map<String, QueryResult> tree = jcrTemplate.query(list, null, silent);
 
         assertSame("Results are not the same", result, tree.get("//*"));
         assertSame("Results are not the same", result, tree.get("//*/@bogus:title"));
 
-        verify(sessionFactory);
-        verify(session);
-        verify(workspace);
-        verify(queryManager);
-        verify(query);
-        verify(result);
+        verify(sessionFactory, session, workspace, queryManager, query, result);
     }
 }

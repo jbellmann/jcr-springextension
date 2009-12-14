@@ -19,7 +19,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
 /**
- * Session Factory interface. This interface describes a simplfied contract for retrieving a session and acts
+ * Session Factory interface. This interface describes a simplified contract for retrieving a session and acts
  * as a central point inside Spring Extensions JCR support. </p>
  * @author Costin Leau
  * @author Sergio Bossa
@@ -44,6 +44,7 @@ public interface SessionFactory {
      * Returns a specific SessionHolder for the given Session. The holder provider is used internally by the
      * framework in components such as transaction managers to provide implementation specific information
      * such as transactional support (if it is available).
+     * @param session
      * @return specific sessionHolder.
      */
     public SessionHolder getSessionHolder(Session session);

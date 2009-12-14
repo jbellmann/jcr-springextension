@@ -15,7 +15,9 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
+import javax.jcr.NamespaceRegistry;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.Workspace;
 
 import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
@@ -50,7 +52,9 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
      */
     protected void registerNodeTypes() throws Exception {
         if (!ObjectUtils.isEmpty(nodeDefinitions)) {
-            Workspace ws = getSession().getWorkspace();
+
+            Session session = getBareSession();
+            Workspace ws = session.getWorkspace();
 
             JackrabbitNodeTypeManager jackrabbitNodeTypeManager = (JackrabbitNodeTypeManager) ws.getNodeTypeManager();
 
@@ -66,6 +70,7 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
                     LOG.error("Error registering nodetypes ", ex.getCause());
                 }
             }
+            session.logout();
         }
     }
 

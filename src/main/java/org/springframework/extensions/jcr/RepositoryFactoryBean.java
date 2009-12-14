@@ -44,12 +44,14 @@ public abstract class RepositoryFactoryBean implements InitializingBean, Disposa
     /**
      * Subclasses have to implement this method to allow specific JSR-170 implementation repository
      * configuration.
+     * @throws Exception
      */
     protected abstract void resolveConfigurationResource() throws Exception;
 
     /**
      * Subclasses have to implement this method to allow specific JSR-170 implementation repository creation.
      * @return
+     * @throws Exception
      */
     protected abstract Repository createRepository() throws Exception;
 

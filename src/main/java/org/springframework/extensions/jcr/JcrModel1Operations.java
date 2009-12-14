@@ -145,6 +145,6 @@ public interface JcrModel1Operations {
      * @param ignoreErrors if true it will populate unfound nodes with null
      * @return a map containing the queries as keys and results as values
      */
-    public Map query(final List list, final String language, final boolean ignoreErrors);
+    public Map<String, QueryResult> query(final List<String> list, final String language, final boolean ignoreErrors);
 
 }

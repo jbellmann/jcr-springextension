@@ -17,6 +17,8 @@ package org.springframework.extensions.jcr.config;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -24,10 +26,15 @@ import org.springframework.extensions.jcr.EventListenerDefinition;
 import org.springframework.extensions.jcr.JcrSessionFactory;
 import org.springframework.util.ObjectUtils;
 
-public class JcrNamespaceHandlerTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class JcrNamespaceHandlerTest {
     private XmlBeanFactory beanFactory;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         this.beanFactory = new XmlBeanFactory(new ClassPathResource("jcrNamespaceHandlerTest.xml"));
     }
 
@@ -39,17 +46,19 @@ public class JcrNamespaceHandlerTest extends TestCase {
         return beanDefinition.getPropertyValues().getPropertyValue(propertyName).getValue();
     }
 
+    @Test
     public void testEventListenerDefinition() throws Exception {
         BeanDefinition beanDefinition = this.beanFactory.getBeanDefinition("eventListenerFull");
         assertSame(EventListenerDefinition.class.getName(), beanDefinition.getBeanClassName());
         assertPropertyValue(beanDefinition, "absPath", "/somePath");
         assertPropertyValue(beanDefinition, "isDeep", "true");
         assertPropertyValue(beanDefinition, "noLocal", "false");
-        assertPropertyValue(beanDefinition, "eventType", new Integer(17));
-        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "123" }, (Object[]) getPropertyValue(beanDefinition, "uuid")));
-        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "foo", "bar" }, (Object[]) getPropertyValue(beanDefinition, "nodeTypeName")));
+        assertPropertyValue(beanDefinition, "eventType", 17);
+        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "123" }, getPropertyValue(beanDefinition, "uuid")));
+        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "foo", "bar" }, getPropertyValue(beanDefinition, "nodeTypeName")));
     }
 
+    @Test
     public void testSessionFactory() throws Exception {
         BeanDefinition beanDefinition = this.beanFactory.getBeanDefinition("sessionFactory");
         assertSame(JcrSessionFactory.class.getName(), beanDefinition.getBeanClassName());

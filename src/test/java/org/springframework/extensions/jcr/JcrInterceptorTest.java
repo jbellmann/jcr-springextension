@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
@@ -32,6 +33,7 @@ import junit.framework.TestCase;
 import org.aopalliance.intercept.Interceptor;
 import org.aopalliance.intercept.Invocation;
 import org.aopalliance.intercept.MethodInvocation;
+import org.junit.Test;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
@@ -39,8 +41,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class JcrInterceptorTest extends TestCase {
+public class JcrInterceptorTest {
 
+    @Test
     public void testInterceptor() throws RepositoryException {
 
         SessionFactory sessionFactory = createMock(SessionFactory.class);
@@ -49,8 +52,8 @@ public class JcrInterceptorTest extends TestCase {
         session.logout();
         expectLastCall().once();
         expect(sessionFactory.getSessionHolder(session)).andReturn(new SessionHolder(session));
-        replay(sessionFactory);
-        replay(session);
+
+        replay(sessionFactory, session);
 
         JcrInterceptor interceptor = new JcrInterceptor();
         interceptor.setSessionFactory(sessionFactory);
@@ -61,16 +64,15 @@ public class JcrInterceptorTest extends TestCase {
             fail("Should not have thrown Throwable: " + t);
         }
 
-        verify(sessionFactory);
-        verify(session);
+        verify(sessionFactory, session);
     }
 
+    @Test
     public void testInterceptorWithPrebound() {
         SessionFactory sessionFactory = createMock(SessionFactory.class);
         Session session = createMock(Session.class);
 
-        replay(sessionFactory);
-        replay(session);
+        replay(sessionFactory, session);
 
         TransactionSynchronizationManager.bindResource(sessionFactory, new SessionHolder(session));
         JcrInterceptor interceptor = new JcrInterceptor();
@@ -84,8 +86,7 @@ public class JcrInterceptorTest extends TestCase {
             TransactionSynchronizationManager.unbindResource(sessionFactory);
         }
 
-        verify(sessionFactory);
-        verify(session);
+        verify(sessionFactory, session);
     }
 
     private static class TestInvocation implements MethodInvocation {

@@ -40,6 +40,7 @@ public class ServiceSessionHolderProviderManager extends CacheableSessionHolderP
      * Loads the service providers using the discovery mechanism.
      * @return the list of service providers found.
      */
+    @SuppressWarnings("unchecked")
     public List<SessionHolderProvider> getProviders() {
         Iterator<SessionHolderProvider> providersIterator = Service.providers(SessionHolderProvider.class, Thread.currentThread().getContextClassLoader());
         List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
