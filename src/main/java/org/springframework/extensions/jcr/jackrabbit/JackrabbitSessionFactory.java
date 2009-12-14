@@ -15,7 +15,6 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import javax.jcr.NamespaceRegistry;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Workspace;

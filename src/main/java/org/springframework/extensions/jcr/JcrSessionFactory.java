@@ -138,8 +138,9 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         if (eventListeners != null && eventListeners.length > 0 && !JcrUtils.supportsObservation(getRepository()))
             throw new IllegalArgumentException("repository " + getRepositoryInfo() + " does NOT support Observation; remove Listener definitions");
 
-        registerNodeTypes();
         registerNamespaces();
+        registerNodeTypes();
+        
 
         // determine the session holder provider
         if (sessionHolderProviderManager == null) {
