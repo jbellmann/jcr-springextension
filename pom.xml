@@ -31,10 +31,10 @@
         <bundlor.enabled>true</bundlor.enabled>
         <bundle.version>1.0.0.SNAPSHOT</bundle.version>
         <!-- this code does not support 3.0.x API. -->
-        <spring.version.range>[2.5.6, 3.0.0)</spring.version.range>
+        <spring.version.range>[2.5.6, 3.0.0.RELEASE]</spring.version.range>
         <!-- lets start with 1.5 and up to 2.0 -->
-        <jackrabbit.version.range>[1.5, 2.0)</jackrabbit.version.range>
-        <spring.version>2.5.6</spring.version>
+        <jackrabbit.version.range>[1.5, 2.0]</jackrabbit.version.range>
+        <spring.version>3.0.0.RELEASE</spring.version>
         <junit.version>4.7</junit.version>
         <easymock.version>2.5.2</easymock.version>
         <easymockclassextension.version>2.4</easymockclassextension.version>

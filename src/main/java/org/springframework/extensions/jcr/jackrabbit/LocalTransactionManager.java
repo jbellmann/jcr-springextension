@@ -22,6 +22,10 @@ import org.apache.jackrabbit.api.XASession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.extensions.jcr.SessionFactory;
+import org.springframework.extensions.jcr.SessionFactoryUtils;
+import org.springframework.extensions.jcr.SessionHolder;
+import org.springframework.extensions.jcr.jackrabbit.support.UserTxSessionHolder;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.InvalidIsolationLevelException;
 import org.springframework.transaction.TransactionDefinition;
@@ -31,11 +35,6 @@ import org.springframework.transaction.support.AbstractPlatformTransactionManage
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.SmartTransactionObject;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.extensions.jcr.SessionFactory;
-import org.springframework.extensions.jcr.SessionFactoryUtils;
-import org.springframework.extensions.jcr.SessionHolder;
-import org.springframework.extensions.jcr.jackrabbit.support.UserTxSessionHolder;
-import org.springframework.transaction.support.TransactionSynchronizationUtils;
 
 /**
  * PlatformTransactionManager implementation for a single JCR SessionFactory. Binds a Jcr session from the
@@ -60,6 +59,8 @@ import org.springframework.transaction.support.TransactionSynchronizationUtils;
  */
 public class LocalTransactionManager extends AbstractPlatformTransactionManager implements InitializingBean {
 
+    private static final long serialVersionUID = 7373391682297806187L;
+    
     private static final Logger LOG = LoggerFactory.getLogger(LocalTransactionManager.class);
     private SessionFactory sessionFactory;
 
@@ -280,6 +281,10 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
 
         public boolean isRollbackOnly() {
             return getSessionHolder().isRollbackOnly();
+        }
+
+        public void flush() {
+            sessionHolder.clear();
         }
     }
 

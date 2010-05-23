@@ -32,6 +32,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
+@SuppressWarnings("unchecked")
 public class RmiServerRepositoryFactoryBean extends AbstractFactoryBean {
     private RemoteRepository remoteRepository;
     private Repository repository;

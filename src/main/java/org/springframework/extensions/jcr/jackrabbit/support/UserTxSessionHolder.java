@@ -22,57 +22,53 @@ import org.apache.jackrabbit.api.XASession;
 import org.springframework.extensions.jcr.SessionHolder;
 
 /**
- * Extension of Session Holder which includes a UserTransaction which handles
- * the XASession returned by the JackRabbit repository implementation.
- * 
+ * Extension of Session Holder which includes a UserTransaction which handles the XASession returned by the
+ * JackRabbit repository implementation.
  * @see org.springframework.extensions.jcr.jackrabbit.support.JackRabbitUserTransaction
- * 
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
  */
 public class UserTxSessionHolder extends SessionHolder {
 
-	private UserTransaction transaction;
+    private UserTransaction transaction;
 
-	/**
-	 * @param session
-	 */
-	public UserTxSessionHolder(Session session) {
-		super(session);
-	}
+    /**
+     * @param session
+     */
+    public UserTxSessionHolder(Session session) {
+        super(session);
+    }
 
-	/**
-	 * @return Returns the transaction.
-	 */
-	public UserTransaction getTransaction() {
-		return transaction;
-	}
+    /**
+     * @return Returns the transaction.
+     */
+    public UserTransaction getTransaction() {
+        return transaction;
+    }
 
-	/**
-	 * @see org.springframework.extensions.jcr.SessionHolder#setSession(javax.jcr.Session)
-	 */
-	public void setSession(Session session) {
-		/*
-		 * if (!(session instanceof XASession)) throw new
-		 * IllegalArgumentException( "Session not of type XASession; actual type
-		 * is " + session.getClass());
-		 */
+    /**
+     * @see org.springframework.extensions.jcr.SessionHolder#setSession(javax.jcr.Session)
+     */
+    public void setSession(Session session) {
+        /*
+         * if (!(session instanceof XASession)) throw new IllegalArgumentException( "Session not of type
+         * XASession; actual type is " + session.getClass());
+         */
 
-		// when using JCA we have another session type
-		if (session instanceof XASession) {
-			transaction = new JackRabbitUserTransaction(session);
-		}
-		super.setSession(session);
-	}
+        // when using JCA we have another session type
+        if (session instanceof XASession) {
+            transaction = new JackRabbitUserTransaction(session);
+        }
+        super.setSession(session);
+    }
 
-	/**
-	 * @see org.springframework.transaction.support.ResourceHolderSupport#clear()
-	 */
-	public void clear() {
-		super.clear();
-		transaction = null;
-	}
+    /**
+     * @see org.springframework.transaction.support.ResourceHolderSupport#clear()
+     */
+    public void clear() {
+        super.clear();
+        transaction = null;
+    }
 
 }

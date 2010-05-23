@@ -22,7 +22,7 @@ Export-Package: org.springframework.extensions.jcr;version="1.0.0.SNAP
  ory,org.springframework.dao,org.springframework.dao.support,org.sprin
  gframework.extensions.jcr,org.springframework.util,org.springframewor
  k.web.filter,org.springframework.web.servlet.handler"
-Build-Jdk: 1.6.0_15
+Build-Jdk: 1.6.0_20
 Built-By: sincandela
 Bundle-Version: 1.0.0.SNAPSHOT
 Tool: Bundlor 1.0.0.M6
@@ -36,24 +36,26 @@ Import-Package: javax.jcr;version="[1.0, 2.0)",javax.jcr.lock;version=
  javax.servlet.http;version="[2.3, 3.0)",javax.transaction;version="[1
  .0.1, 2.0.0)",javax.transaction.xa;version="[1.0.1, 2.0.0)",org.aopal
  liance.intercept;version="[1.0.0, 2.0.0)",org.apache.jackrabbit.api;v
- ersion="[1.5, 2.0)",org.apache.jackrabbit.core;version="[1.5, 2.0)",o
- rg.apache.jackrabbit.core.config;version="[1.5, 2.0)",org.apache.jack
- rabbit.rmi.remote;version="[1.5, 2.0)",org.apache.jackrabbit.rmi.serv
- er;version="[1.5, 2.0)",org.apache.xerces.util;version="0",org.slf4j;
+ ersion="[1.5, 2.0]",org.apache.jackrabbit.core;version="[1.5, 2.0]",o
+ rg.apache.jackrabbit.core.config;version="[1.5, 2.0]",org.apache.jack
+ rabbit.rmi.remote;version="[1.5, 2.0]",org.apache.jackrabbit.rmi.serv
+ er;version="[1.5, 2.0]",org.apache.xerces.util;version="0",org.slf4j;
  version="[1.5.6, 2.0.0)",org.springframework.beans.factory;version="[
- 2.5.6, 3.0.0)",org.springframework.beans.factory.config;version="[2.5
- .6, 3.0.0)",org.springframework.beans.factory.support;version="[2.5.6
- , 3.0.0)",org.springframework.beans.factory.xml;version="[2.5.6, 3.0.
- 0)",org.springframework.core;version="[2.5.6, 3.0.0)",org.springframe
- work.core.io;version="[2.5.6, 3.0.0)",org.springframework.dao;version
- ="[2.5.6, 3.0.0)",org.springframework.dao.support;version="[2.5.6, 3.
- 0.0)",org.springframework.transaction;version="[2.5.6, 3.0.0)",org.sp
- ringframework.transaction.support;version="[2.5.6, 3.0.0)",org.spring
- framework.util;version="[2.5.6, 3.0.0)",org.springframework.util.xml;
- version="[2.5.6, 3.0.0)",org.springframework.web.context;version="[2.
- 5.6, 3.0.0)",org.springframework.web.context.support;version="[2.5.6,
-  3.0.0)",org.springframework.web.filter;version="[2.5.6, 3.0.0)",org.
- springframework.web.servlet.handler;version="[2.5.6, 3.0.0)",org.w3c.
- dom;version="0",org.xml.sax;version="0"
+ 2.5.6, 3.0.0.RELEASE]",org.springframework.beans.factory.config;versi
+ on="[2.5.6, 3.0.0.RELEASE]",org.springframework.beans.factory.support
+ ;version="[2.5.6, 3.0.0.RELEASE]",org.springframework.beans.factory.x
+ ml;version="[2.5.6, 3.0.0.RELEASE]",org.springframework.core;version=
+ "[2.5.6, 3.0.0.RELEASE]",org.springframework.core.io;version="[2.5.6,
+  3.0.0.RELEASE]",org.springframework.dao;version="[2.5.6, 3.0.0.RELEA
+ SE]",org.springframework.dao.support;version="[2.5.6, 3.0.0.RELEASE]"
+ ,org.springframework.transaction;version="[2.5.6, 3.0.0.RELEASE]",org
+ .springframework.transaction.support;version="[2.5.6, 3.0.0.RELEASE]"
+ ,org.springframework.util;version="[2.5.6, 3.0.0.RELEASE]",org.spring
+ framework.util.xml;version="[2.5.6, 3.0.0.RELEASE]",org.springframewo
+ rk.web.context;version="[2.5.6, 3.0.0.RELEASE]",org.springframework.w
+ eb.context.support;version="[2.5.6, 3.0.0.RELEASE]",org.springframewo
+ rk.web.filter;version="[2.5.6, 3.0.0.RELEASE]",org.springframework.we
+ b.servlet.handler;version="[2.5.6, 3.0.0.RELEASE]",org.w3c.dom;versio
+ n="0",org.xml.sax;version="0"
 Archiver-Version: Plexus Archiver
 
