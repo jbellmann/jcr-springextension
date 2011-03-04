@@ -237,8 +237,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
      * @see org.springframework.beans.factory.DisposableBean#destroy()
      */
     public void destroy() throws Exception {
-        unregisterNamespaces();
         unregisterNodeTypes();
+        unregisterNamespaces();
     }
 
     /**
