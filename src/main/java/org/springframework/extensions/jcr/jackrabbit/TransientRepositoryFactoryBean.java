@@ -32,8 +32,8 @@ import org.apache.jackrabbit.core.TransientRepository;
  */
 public class TransientRepositoryFactoryBean extends RepositoryFactoryBean {
 
-	protected Repository createRepository() throws Exception {
-		return new TransientRepository(getRepositoryConfig());
-	}
+    protected Repository createRepository() throws Exception {
+        return new TransientRepository(getRepositoryConfig());
+    }
 
 }
