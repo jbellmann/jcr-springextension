@@ -25,10 +25,10 @@ import javax.jcr.Workspace;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeTypeManager;
 
-import org.apache.jackrabbit.core.nodetype.NodeTypeDef;
 import org.apache.jackrabbit.core.nodetype.NodeTypeManagerImpl;
 import org.apache.jackrabbit.core.nodetype.NodeTypeRegistry;
 import org.apache.jackrabbit.core.nodetype.xml.NodeTypeReader;
+import org.apache.jackrabbit.spi.QNodeTypeDefinition;
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.jcr.JcrSessionFactory;
 
@@ -52,6 +52,7 @@ public class OcmJackrabbitSessionFactory extends JcrSessionFactory {
      * Register the namespaces.
      * @throws RepositoryException
      */
+    @Override
     protected void registerNamespaces() throws Exception {
         NamespaceRegistry registry = getSession().getWorkspace().getNamespaceRegistry();
 
@@ -88,20 +89,21 @@ public class OcmJackrabbitSessionFactory extends JcrSessionFactory {
         super.registerNamespaces();
     }
 
+    @Override
     protected void registerNodeTypes() throws Exception {
         if (nodeTypes2Import == null)
             return;
         InputStream xml = nodeTypes2Import.getInputStream();
 
         // HINT: throws InvalidNodeTypeDefException, IOException
-        NodeTypeDef[] types = NodeTypeReader.read(xml);
+        QNodeTypeDefinition[] types = NodeTypeReader.read(xml);
 
         Workspace workspace = getSession().getWorkspace();
         NodeTypeManager ntMgr = workspace.getNodeTypeManager();
         NodeTypeRegistry ntReg = ((NodeTypeManagerImpl) ntMgr).getNodeTypeRegistry();
 
         for (int j = 0; j < types.length; j++) {
-            NodeTypeDef def = types[j];
+            QNodeTypeDefinition def = types[j];
 
             try {
                 ntReg.getNodeTypeDef(def.getName());
