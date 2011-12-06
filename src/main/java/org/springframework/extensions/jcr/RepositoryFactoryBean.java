@@ -29,7 +29,7 @@ import org.springframework.core.io.Resource;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public abstract class RepositoryFactoryBean implements InitializingBean, DisposableBean, FactoryBean {
+public abstract class RepositoryFactoryBean implements InitializingBean, DisposableBean, FactoryBean<Repository> {
 
     /**
      * Repository configuration.
@@ -73,14 +73,14 @@ public abstract class RepositoryFactoryBean implements InitializingBean, Disposa
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
-    public Object getObject() throws Exception {
+    public Repository getObject() throws Exception {
         return this.repository;
     }
 
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
-    public Class getObjectType() {
+    public Class<Repository> getObjectType() {
         // the repository is proxied.
         return Repository.class;
     }
