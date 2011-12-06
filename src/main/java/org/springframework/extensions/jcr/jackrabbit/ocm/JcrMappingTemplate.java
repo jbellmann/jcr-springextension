@@ -1,18 +1,17 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Copyright 2009-2012 the original author or authors
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm;
 
@@ -84,6 +83,7 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
     /**
      * Add rule for checking the mapper.
      */
+    @Override
     public void afterPropertiesSet() {
         super.afterPropertiesSet();
         if (mapper == null)
@@ -96,7 +96,7 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
      */
     public QueryManager createQueryManager() {
         try {
-            Map atomicTypeConverters = this.createDefaultConverters(this.getSession());
+            Map<Class<?>, AtomicTypeConverter> atomicTypeConverters = this.createDefaultConverters(this.getSession());
             return new QueryManagerImpl(mapper, atomicTypeConverters, this.getSession().getValueFactory());
         } catch (RepositoryException e) {
             throw new JcrSystemException(e);
@@ -111,7 +111,8 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
      * @throws JcrMappingException
      * @throws javax.jcr.RepositoryException
      */
-    protected ObjectContentManager createPersistenceManager(Session session) throws RepositoryException, JcrMappingException {
+    protected ObjectContentManager createPersistenceManager(Session session) throws RepositoryException,
+            JcrMappingException {
         return new ObjectContentManagerImpl(session, mapper);
     }
 
@@ -121,8 +122,8 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
      * @return
      * @throws javax.jcr.RepositoryException
      */
-    protected Map createDefaultConverters(Session session) throws RepositoryException {
-        Map<Class, AtomicTypeConverter> map = new HashMap<Class, AtomicTypeConverter>(14);
+    protected Map<Class<?>, AtomicTypeConverter> createDefaultConverters(Session session) throws RepositoryException {
+        Map<Class<?>, AtomicTypeConverter> map = new HashMap<Class<?>, AtomicTypeConverter>(14);
 
         map.put(String.class, new StringTypeConverterImpl());
         map.put(InputStream.class, new BinaryTypeConverterImpl());
@@ -145,6 +146,7 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
     public <T> T execute(final JcrMappingCallback<T> action, boolean exposeNativeSession) throws DataAccessException {
         return execute(new JcrCallback<T>() {
 
+            @Override
             public T doInJcr(Session session) throws RepositoryException {
                 try {
                     return action.doInJcrMapping(createPersistenceManager(session));
@@ -156,6 +158,7 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
         }, exposeNativeSession);
     }
 
+    @Override
     public <T> T execute(JcrMappingCallback<T> callback) throws DataAccessException {
         return execute(callback, isExposeNativeSession());
     }
@@ -164,8 +167,10 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
     // Delegate methods
     // ----------------
 
+    @Override
     public void insert(final java.lang.Object object) {
         execute(new JcrMappingCallback<Void>() {
+            @Override
             public Void doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 manager.insert(object);
                 return null;
@@ -173,8 +178,10 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
         }, true);
     }
 
+    @Override
     public void update(final java.lang.Object object) {
         execute(new JcrMappingCallback<Void>() {
+            @Override
             public Void doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 manager.update(object);
                 return null;
@@ -182,8 +189,10 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
         }, true);
     }
 
+    @Override
     public void remove(final java.lang.String path) {
         execute(new JcrMappingCallback<Void>() {
+            @Override
             public Void doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 manager.remove(path);
                 return null;
@@ -191,16 +200,20 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
         }, true);
     }
 
+    @Override
     public Object getObject(final java.lang.String path) {
         return execute(new JcrMappingCallback<Object>() {
+            @Override
             public Object doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 return manager.getObject(path);
             }
         }, true);
     }
 
+    @Override
     public Collection getObjects(final Query query) {
         return execute(new JcrMappingCallback<Collection>() {
+            @Override
             public Collection doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 return manager.getObjects(query);
             }

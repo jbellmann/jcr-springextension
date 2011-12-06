@@ -15,20 +15,19 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertSame;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 
-import org.apache.jackrabbit.api.XASession;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.extensions.jcr.JcrInterceptor;
 import org.springframework.extensions.jcr.SessionFactory;
 import org.springframework.extensions.jcr.SessionHolder;
@@ -39,29 +38,21 @@ import org.springframework.extensions.jcr.support.ListSessionHolderProviderManag
 /**
  * 
  * @author Joerg Bellmann
- * 
- * see {@link JcrInterceptor2Test#testCreateSessionHolder()}
  *
  */
-@Ignore
-public class JcrInterceptorTest {
+public class JcrInterceptor2Test {
 
-    /*
-     * Test method for
-     * 'org.springframework.extensions.jcr.jackrabbit.JcrInterceptor.createSessionHolder(Session)'
-     */
+    private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
+    private final Session session = Mockito.mock(Session.class, Mockito.withSettings()
+            .extraInterfaces(XAResource.class));
+
+    @Before
+    public void setUp() throws RepositoryException, XAException {
+        Mockito.when(sessionFactory.getSession()).thenReturn(session);
+    }
+
     @Test
-    public void testCreateSessionHolder() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        XAResource xaResource = createMock(XAResource.class);
-
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-
-        replay(sessionFactory);
-        replay(xaSession);
-        replay(xaResource);
-
+    public void testCreateSessionHolder() {
         JcrInterceptor interceptor = new JcrInterceptor();
         ListSessionHolderProviderManager manager = new ListSessionHolderProviderManager();
         List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
@@ -73,12 +64,9 @@ public class JcrInterceptorTest {
 
         SessionHolder holder = null;
 
-        holder = provider.createSessionHolder(xaSession);
+        holder = provider.createSessionHolder(session);
 
-        assertSame(xaSession, holder.getSession());
-
-        verify(sessionFactory);
-        verify(xaSession);
-        verify(xaResource);
+        assertSame(session, holder.getSession());
     }
+
 }

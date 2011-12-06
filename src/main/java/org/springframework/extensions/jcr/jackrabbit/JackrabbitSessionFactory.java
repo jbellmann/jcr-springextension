@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Workspace;
 
-import org.apache.jackrabbit.api.JackrabbitNodeTypeManager;
+import org.apache.jackrabbit.core.nodetype.NodeTypeManagerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -38,24 +38,27 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(JackrabbitSessionFactory.class);
 
+    private static final String DEFAULT_CONTENT_TYPE = "text/xml";
+
     /**
      * Node definitions in CND format.
      */
     private Resource[] nodeDefinitions;
 
-    private String contentType = JackrabbitNodeTypeManager.TEXT_XML;
+    private String contentType = DEFAULT_CONTENT_TYPE;
 
     /*
      * (non-Javadoc)
      * @see org.springframework.extensions.jcr.JcrSessionFactory#registerNodeTypes()
      */
+    @Override
     protected void registerNodeTypes() throws Exception {
         if (!ObjectUtils.isEmpty(nodeDefinitions)) {
 
             Session session = getBareSession();
             Workspace ws = session.getWorkspace();
 
-            JackrabbitNodeTypeManager jackrabbitNodeTypeManager = (JackrabbitNodeTypeManager) ws.getNodeTypeManager();
+            NodeTypeManagerImpl jackrabbitNodeTypeManager = (NodeTypeManagerImpl) ws.getNodeTypeManager();
 
             boolean debug = LOG.isDebugEnabled();
             for (int i = 0; i < nodeDefinitions.length; i++) {
@@ -64,6 +67,7 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
                     LOG.debug("adding node type definitions from " + resource.getDescription());
                 }
                 try {
+                    //                    ws.getNodeTypeManager().registerNodeType(ntd, allowUpdate)
                     jackrabbitNodeTypeManager.registerNodeTypes(resource.getInputStream(), contentType);
                 } catch (RepositoryException ex) {
                     LOG.error("Error registering nodetypes ", ex.getCause());
@@ -82,8 +86,8 @@ public class JackrabbitSessionFactory extends JcrSessionFactory {
 
     /**
      * Indicate the node definition content type (by default, JackrabbitNodeTypeManager#TEXT_XML).
-     * @see JackrabbitNodeTypeManager#TEXT_X_JCR_CND
-     * @see JackrabbitNodeTypeManager#TEXT_XML
+     * @see NodeTypeManagerImpl#TEXT_X_JCR_CND
+     * @see NodeTypeManagerImpl#TEXT_XML
      * @param contentType The contentType to set.
      */
     public void setContentType(String contentType) {

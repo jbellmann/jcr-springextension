@@ -42,7 +42,7 @@
 			
 			<xsd:attribute name="id" type="xsd:ID" use="required"/>
 			<xsd:attribute name="absPath" type="xsd:string" default="/"/>
-			<xsd:attribute name="isDeep" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="deep" type="xsd:boolean" default="true"/>
 			<xsd:attribute name="noLocal" type="xsd:boolean" default="false"/>
 		</xsd:complexType>
 	</xsd:element>

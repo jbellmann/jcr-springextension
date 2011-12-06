@@ -1,18 +1,17 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Copyright 2009-2012 the original author or authors
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm;
 
@@ -25,10 +24,10 @@ import javax.jcr.Workspace;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeTypeManager;
 
-import org.apache.jackrabbit.core.nodetype.NodeTypeDef;
 import org.apache.jackrabbit.core.nodetype.NodeTypeManagerImpl;
 import org.apache.jackrabbit.core.nodetype.NodeTypeRegistry;
 import org.apache.jackrabbit.core.nodetype.xml.NodeTypeReader;
+import org.apache.jackrabbit.spi.QNodeTypeDefinition;
 import org.springframework.core.io.Resource;
 import org.springframework.extensions.jcr.JcrSessionFactory;
 
@@ -52,6 +51,7 @@ public class OcmJackrabbitSessionFactory extends JcrSessionFactory {
      * Register the namespaces.
      * @throws RepositoryException
      */
+    @Override
     protected void registerNamespaces() throws Exception {
         NamespaceRegistry registry = getSession().getWorkspace().getNamespaceRegistry();
 
@@ -88,20 +88,21 @@ public class OcmJackrabbitSessionFactory extends JcrSessionFactory {
         super.registerNamespaces();
     }
 
+    @Override
     protected void registerNodeTypes() throws Exception {
         if (nodeTypes2Import == null)
             return;
         InputStream xml = nodeTypes2Import.getInputStream();
 
         // HINT: throws InvalidNodeTypeDefException, IOException
-        NodeTypeDef[] types = NodeTypeReader.read(xml);
+        QNodeTypeDefinition[] types = NodeTypeReader.read(xml);
 
         Workspace workspace = getSession().getWorkspace();
         NodeTypeManager ntMgr = workspace.getNodeTypeManager();
         NodeTypeRegistry ntReg = ((NodeTypeManagerImpl) ntMgr).getNodeTypeRegistry();
 
         for (int j = 0; j < types.length; j++) {
-            NodeTypeDef def = types[j];
+            QNodeTypeDefinition def = types[j];
 
             try {
                 ntReg.getNodeTypeDef(def.getName());

@@ -1,29 +1,25 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Copyright 2009-2012 the original author or authors
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.ocm.exception.JcrMappingException;
 import org.apache.jackrabbit.ocm.mapper.impl.digester.DigesterDescriptorReader;
-import org.apache.jackrabbit.ocm.mapper.model.ClassDescriptor;
 import org.apache.jackrabbit.ocm.mapper.model.MappingDescriptor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,9 +30,9 @@ import org.springframework.core.io.Resource;
  * them into an overall class descriptor.
  * @author Costin Leau
  */
-public class MappingDescriptorFactoryBean implements FactoryBean, InitializingBean {
+public class MappingDescriptorFactoryBean implements FactoryBean<MappingDescriptor>, InitializingBean {
 
-    private static final Log log = LogFactory.getLog(MappingDescriptorFactoryBean.class);
+    //    private static final Log log = LogFactory.getLog(MappingDescriptorFactoryBean.class);
 
     private MappingDescriptor mappingDescriptor;
 
@@ -45,20 +41,24 @@ public class MappingDescriptorFactoryBean implements FactoryBean, InitializingBe
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
-    public Object getObject() throws Exception {
+    @Override
+    public MappingDescriptor getObject() throws Exception {
         return mappingDescriptor;
     }
 
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
-    public Class getObjectType() {
-        return (this.mappingDescriptor != null) ? this.mappingDescriptor.getClass() : ClassDescriptor.class;
+    @Override
+    public Class<MappingDescriptor> getObjectType() {
+        //        return (this.mappingDescriptor != null) ? this.mappingDescriptor.getClass() : ClassDescriptor.class;
+        return MappingDescriptor.class;
     }
 
     /**
      * @see org.springframework.beans.factory.FactoryBean#isSingleton()
      */
+    @Override
     public boolean isSingleton() {
         return true;
     }
@@ -66,6 +66,7 @@ public class MappingDescriptorFactoryBean implements FactoryBean, InitializingBe
     /**
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (mappings == null || mappings.length == 0)
             throw new IllegalArgumentException("at least one mapping file is needed");

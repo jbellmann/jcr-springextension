@@ -13,27 +13,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.springframework.extensions.jcr.jackrabbit;
+package org.springframework.extensions.jcr.config;
 
-import javax.jcr.Repository;
+import javax.jcr.observation.EventIterator;
+import javax.jcr.observation.EventListener;
 
-import org.apache.jackrabbit.core.TransientRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * FactoryBean for creating Jackrabbit's TransientRepository (i.e. repository
- * are initialized for the first session and closed once the last session is
- * closed.
+ * Simple EventListener for Testing.
  * 
- * @author Costin Leau
- * @author Sergio Bossa 
- * @author Salvatore Incandela
- * 
- * @since 0.5
+ * @author Joerg Bellmann
+ *
  */
-public class TransientRepositoryFactoryBean extends RepositoryFactoryBean {
+public class TestEventListener implements EventListener {
 
-    protected Repository createRepository() throws Exception {
-        return new TransientRepository(getRepositoryConfig());
+    private static final Logger LOG = LoggerFactory.getLogger(TestEventListener.class);
+
+    @Override
+    public void onEvent(EventIterator events) {
+        LOG.info("GOT EVENTS: " + events.getSize());
     }
 
 }

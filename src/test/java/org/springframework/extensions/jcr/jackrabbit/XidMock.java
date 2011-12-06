@@ -15,25 +15,45 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import javax.jcr.Repository;
-
-import org.apache.jackrabbit.core.TransientRepository;
+import javax.transaction.xa.Xid;
 
 /**
- * FactoryBean for creating Jackrabbit's TransientRepository (i.e. repository
- * are initialized for the first session and closed once the last session is
- * closed.
- * 
+ * Simple mock which overrides equals.
  * @author Costin Leau
- * @author Sergio Bossa 
+ * @author Sergio Bossa
  * @author Salvatore Incandela
- * 
- * @since 0.5
  */
-public class TransientRepositoryFactoryBean extends RepositoryFactoryBean {
+class XidMock implements Xid {
+    /**
+     * @see javax.transaction.xa.Xid#getBranchQualifier()
+     */
+    @Override
+    public byte[] getBranchQualifier() {
+        return null;
+    }
 
-    protected Repository createRepository() throws Exception {
-        return new TransientRepository(getRepositoryConfig());
+    /**
+     * @see javax.transaction.xa.Xid#getFormatId()
+     */
+    @Override
+    public int getFormatId() {
+        return 0;
+    }
+
+    /**
+     * @see javax.transaction.xa.Xid#getGlobalTransactionId()
+     */
+    @Override
+    public byte[] getGlobalTransactionId() {
+        return null;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return true;
     }
 
 }

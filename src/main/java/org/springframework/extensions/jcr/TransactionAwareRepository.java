@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ import org.springframework.util.ObjectUtils;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-public class TransactionAwareRepository implements InitializingBean, FactoryBean {
+public class TransactionAwareRepository implements InitializingBean, FactoryBean<Repository> {
 
     private JcrSessionFactory sessionFactory;
     private Repository proxy;
@@ -79,14 +79,14 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObject()
      */
-    public Object getObject() throws Exception {
+    public Repository getObject() throws Exception {
         return proxy;
     }
 
     /**
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
-    public Class getObjectType() {
+    public Class<Repository> getObjectType() {
         return Repository.class;
     }
 
@@ -112,7 +112,8 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
             throw new IllegalArgumentException("sessionFactory is required");
         // the rest of the properties are set by the setTargetFactory
         if (!allowNonTxRepository && !JcrUtils.supportsTransactions(sessionFactory.getRepository()))
-            throw new IllegalArgumentException(sessionFactory.toString() + " does NOT support transactions and allowNonTxRepository is false");
+            throw new IllegalArgumentException(sessionFactory.toString()
+                    + " does NOT support transactions and allowNonTxRepository is false");
     }
 
     /**
@@ -157,7 +158,8 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
      */
     public void setTargetFactory(JcrSessionFactory target) {
         this.sessionFactory = target;
-        this.proxy = (Repository) Proxy.newProxyInstance(Repository.class.getClassLoader(), new Class[] { Repository.class }, new TransactionAwareRepositoryInvocationHandler());
+        this.proxy = (Repository) Proxy.newProxyInstance(Repository.class.getClassLoader(),
+                new Class[] { Repository.class }, new TransactionAwareRepositoryInvocationHandler());
     }
 
     /**
@@ -182,7 +184,7 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
                 boolean matched = false;
 
                 // check method signature
-                Class[] paramTypes = method.getParameterTypes();
+                Class<?>[] paramTypes = method.getParameterTypes();
 
                 // a. login()
                 if (paramTypes.length == 0) {
@@ -198,13 +200,15 @@ public class TransactionAwareRepository implements InitializingBean, FactoryBean
                 } else if (paramTypes.length == 2) {
                     // d. login(Credentials credentials, java.lang.String
                     // workspaceName)
-                    matched = ObjectUtils.nullSafeEquals(args[0], sessionFactory.getCredentials()) && ObjectUtils.nullSafeEquals(args[1], sessionFactory.getWorkspaceName());
+                    matched = ObjectUtils.nullSafeEquals(args[0], sessionFactory.getCredentials())
+                            && ObjectUtils.nullSafeEquals(args[1], sessionFactory.getWorkspaceName());
                 }
 
                 if (matched) {
                     Session session = SessionFactoryUtils.getSession(sessionFactory, isAllowCreate());
-                    Class[] ifcs = ClassUtils.getAllInterfaces(session);
-                    return (Session) Proxy.newProxyInstance(getClass().getClassLoader(), ifcs, new TransactionAwareInvocationHandler(session, sessionFactory));
+                    Class<?>[] ifcs = ClassUtils.getAllInterfaces(session);
+                    return Proxy.newProxyInstance(getClass().getClassLoader(), ifcs,
+                            new TransactionAwareInvocationHandler(session, sessionFactory));
                 }
             } else if (method.getName().equals("equals")) {
                 // Only consider equal when proxies are identical.

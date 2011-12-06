@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,57 +15,53 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.extensions.jcr.jackrabbit.RepositoryFactoryBean;
+import static org.junit.Assert.assertEquals;
+
 import javax.jcr.Repository;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
-import static org.junit.Assert.assertEquals;
+public class RepositoryFactoryBeanTest {
 
-public class RepositoryFactoryBeanTest  {
-
-	RepositoryFactoryBean factory;
+    RepositoryFactoryBean factory;
 
     @Before
-	public void setUp() throws Exception {
-		factory = new RepositoryFactoryBean();
-	}
+    public void setUp() throws Exception {
+        factory = new RepositoryFactoryBean();
+    }
 
-
-	/*
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.resolveConfigurationResource()'
-	 */
+    /*
+     * Test method for
+     * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.resolveConfigurationResource()'
+     */
     @Test
-	public void testResolveConfigurationResource() throws Exception {
+    public void testResolveConfigurationResource() throws Exception {
 
-		factory.resolveConfigurationResource();
-		DefaultResourceLoader loader = new DefaultResourceLoader();
-		Resource res = loader.getResource("/repository.xml");
-		assertEquals(res, factory.getConfiguration());
-		assertEquals(".", factory.getHomeDir().getFilename());
+        factory.resolveConfigurationResource();
+        DefaultResourceLoader loader = new DefaultResourceLoader();
+        Resource res = loader.getResource("/repository.xml");
+        assertEquals(res, factory.getConfiguration());
+        assertEquals(".", factory.getHomeDir().getFilename());
 
-	}
+    }
 
-	/*
-	 * Test method for
-	 * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.createRepository()'
-	 */
+    /*
+     * Test method for
+     * 'org.springframework.extensions.jcr.jeceira.RepositoryFactoryBean.createRepository()'
+     */
     @Test
-	public void testCreateRepository() throws Exception {
-		factory.afterPropertiesSet();
-		Repository rep = (Repository) factory.getObject();
-		assertEquals(rep.getDescriptor("jcr.repository.name"), "Jackrabbit");
+    public void testCreateRepository() throws Exception {
+        factory.afterPropertiesSet();
+        Repository rep = (Repository) factory.getObject();
+        assertEquals(rep.getDescriptor("jcr.repository.name"), "Jackrabbit");
 
-		assertEquals(true, factory.getObject() instanceof Repository);
-		assertEquals(true, factory.isSingleton());
-		assertEquals(Repository.class, factory.getObjectType());
-		factory.destroy();
+        assertEquals(true, factory.getObject() instanceof Repository);
+        assertEquals(true, factory.isSingleton());
+        assertEquals(Repository.class, factory.getObjectType());
+        factory.destroy();
 
-	}
+    }
 }

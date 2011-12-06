@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -71,8 +71,15 @@ public interface JcrModel1Operations {
 
     /**
      * @see javax.jcr.Session#getNodeByUUID(java.lang.String)
+     * @deprecated use {@link #getNodeByIdentifier(String)}
      */
+    @Deprecated
     public Node getNodeByUUID(String uuid);
+
+    /**
+     * @see javax.jcr.Session#getNodeByIdentifier(java.lang.String)
+     */
+    public Node getNodeByIdentifier(String id);
 
     /**
      * @see javax.jcr.Session#getRootNode();

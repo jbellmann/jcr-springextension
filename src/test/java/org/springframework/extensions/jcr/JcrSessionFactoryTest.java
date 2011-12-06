@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,11 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +36,6 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Workspace;
 import javax.jcr.observation.ObservationManager;
-
-import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -139,8 +141,10 @@ public class JcrSessionFactoryTest {
 
         expect(workspace.getObservationManager()).andReturn(observationManager);
 
-        observationManager.addEventListener(def1.getListener(), def1.getEventTypes(), def1.getAbsPath(), def1.isDeep(), def1.getUuid(), def1.getNodeTypeName(), def1.isNoLocal());
-        observationManager.addEventListener(def2.getListener(), def2.getEventTypes(), def2.getAbsPath(), def2.isDeep(), def2.getUuid(), def2.getNodeTypeName(), def2.isNoLocal());
+        observationManager.addEventListener(def1.getListener(), def1.getEventTypes(), def1.getAbsPath(), def1.isDeep(),
+                def1.getUuid(), def1.getNodeTypeName(), def1.isNoLocal());
+        observationManager.addEventListener(def2.getListener(), def2.getEventTypes(), def2.getAbsPath(), def2.isDeep(),
+                def2.getUuid(), def2.getNodeTypeName(), def2.isNoLocal());
 
         replay(repository, session, workspace, observationManager);
 
@@ -268,7 +272,7 @@ public class JcrSessionFactoryTest {
         namespaceRegistry.registerNamespace("hocus", "pocus");
 
         session.logout();
-        
+
         replay(namespaceRegistry, workspace, session, repository);
 
         factory.afterPropertiesSet();
@@ -302,7 +306,7 @@ public class JcrSessionFactoryTest {
         namespaceRegistry.registerNamespace("hocus", "pocus");
 
         session.logout();
-        
+
         expect(namespaceRegistry.getPrefixes()).andReturn(new String[0]);
 
         replay(namespaceRegistry, workspace, session, repository);
@@ -343,6 +347,7 @@ public class JcrSessionFactoryTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
              */
+            @Override
             public boolean acceptsRepository(String repositoryName) {
                 return REPO_NAME.equals(repositoryName);
             }
@@ -350,6 +355,7 @@ public class JcrSessionFactoryTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
              */
+            @Override
             public SessionHolder createSessionHolder(Session session) {
                 return new CustomSessionHolder(session);
             }

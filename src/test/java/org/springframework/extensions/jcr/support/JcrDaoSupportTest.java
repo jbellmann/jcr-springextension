@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 the original author or authors
+ * Copyright 2009-2012 the original author or authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import static org.junit.Assert.fail;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-
-import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -69,7 +67,8 @@ public class JcrDaoSupportTest {
 
         replay(sessionFactory, session);
 
-        JcrDaoSupport dao = new JcrDaoSupport(){};
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
         dao.setSessionFactory(sessionFactory);
         dao.afterPropertiesSet();
@@ -156,7 +155,7 @@ public class JcrDaoSupportTest {
         dao.releaseSession(session);
     }
 
-    @Test 
+    @Test
     public void testConvertException() {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };
