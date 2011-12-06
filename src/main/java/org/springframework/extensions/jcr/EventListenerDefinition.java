@@ -27,7 +27,7 @@ import org.springframework.beans.factory.InitializingBean;
  * <li>absPath = "/"</li>
  * <li>eventTypes = Event.NODE_ADDED | Event.NODE_REMOVED | Event.PROPERTY_ADDED | Event.PROPERTY_CHANGED |
  * Event.PROPERTY_REMOVED</li>
- * <li>isDeep = true</li>
+ * <li>deep = true</li>
  * <li>uuid = null</li>
  * <li>nodeTypeName = null</li>
  * <li>noLocal = false</li>
@@ -41,10 +41,11 @@ import org.springframework.beans.factory.InitializingBean;
 public class EventListenerDefinition implements InitializingBean {
 
     private EventListener listener;
-    private int eventTypes = Event.NODE_ADDED | Event.NODE_REMOVED | Event.PROPERTY_ADDED | Event.PROPERTY_CHANGED | Event.PROPERTY_REMOVED;
+    private int eventTypes = Event.NODE_ADDED | Event.NODE_REMOVED | Event.PROPERTY_ADDED | Event.PROPERTY_CHANGED
+            | Event.PROPERTY_REMOVED;
 
     String absPath = "/";
-    boolean isDeep = true;
+    boolean deep = true;
     String[] uuid;
     String[] nodeTypeName;
     boolean noLocal = false;
@@ -81,14 +82,14 @@ public class EventListenerDefinition implements InitializingBean {
      * @return Returns the isDeep.
      */
     public boolean isDeep() {
-        return isDeep;
+        return deep;
     }
 
     /**
      * @param isDeep The isDeep to set.
      */
-    public void setDeep(boolean isDeep) {
-        this.isDeep = isDeep;
+    public void setDeep(boolean deep) {
+        this.deep = deep;
     }
 
     /**
@@ -151,6 +152,7 @@ public class EventListenerDefinition implements InitializingBean {
      * (non-Javadoc)
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (listener == null)
             throw new IllegalArgumentException("listener is required");
