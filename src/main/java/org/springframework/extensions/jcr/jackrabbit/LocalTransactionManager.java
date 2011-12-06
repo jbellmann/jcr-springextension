@@ -17,8 +17,8 @@ package org.springframework.extensions.jcr.jackrabbit;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.transaction.xa.XAResource;
 
-import org.apache.jackrabbit.api.XASession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,8 +60,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class LocalTransactionManager extends AbstractPlatformTransactionManager implements InitializingBean {
 
     private static final long serialVersionUID = 7373391682297806187L;
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(LocalTransactionManager.class);
+
     private SessionFactory sessionFactory;
 
     /**
@@ -85,18 +86,21 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         this.sessionFactory = sessionFactory;
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         if (getSessionFactory() == null)
             throw new IllegalArgumentException("repository is required");
     }
 
+    @Override
     protected Object doGetTransaction() throws TransactionException {
         JcrTransactionObject txObject = new JcrTransactionObject();
 
         if (TransactionSynchronizationManager.hasResource(getSessionFactory())) {
-            UserTxSessionHolder sessionHolder = (UserTxSessionHolder) TransactionSynchronizationManager.getResource(getSessionFactory());
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found thread-bound session [" + sessionHolder.getSession() + "] for JCR transaction");
+            UserTxSessionHolder sessionHolder = (UserTxSessionHolder) TransactionSynchronizationManager
+                    .getResource(getSessionFactory());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Found thread-bound session [" + sessionHolder.getSession() + "] for JCR transaction");
             }
             txObject.setSessionHolder(sessionHolder, false);
         }
@@ -104,16 +108,19 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         return txObject;
     }
 
+    @Override
     protected boolean isExistingTransaction(Object transaction) throws TransactionException {
         return ((JcrTransactionObject) transaction).hasTransaction();
     }
 
+    @Override
     protected void doBegin(Object transaction, TransactionDefinition transactionDefinition) throws TransactionException {
         if (transactionDefinition.getIsolationLevel() != TransactionDefinition.ISOLATION_DEFAULT) {
             throw new InvalidIsolationLevelException("JCR does not support an isolation level concept");
         }
 
-        XASession session = null;
+        //        XASession session = null;
+        XAResource session = null;
 
         try {
             JcrTransactionObject txObject = (JcrTransactionObject) transaction;
@@ -122,11 +129,12 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
                 Session newSession = sessionFactory.getSession();
 
                 // make sure we have an XASession
-                if (!(newSession instanceof XASession))
+                //                if (!(newSession instanceof XASession))
+                if (!(newSession instanceof XAResource))
                     throw new IllegalArgumentException("transactions are not supported by your Jcr Repository");
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Opened new session [" + newSession + "] for JCR transaction");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Opened new session [" + newSession + "] for JCR transaction");
                 }
                 txObject.setSessionHolder(new UserTxSessionHolder(newSession), true);
             }
@@ -134,7 +142,8 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
             UserTxSessionHolder sessionHolder = txObject.getSessionHolder();
 
             sessionHolder.setSynchronizedWithTransaction(true);
-            session = (XASession) sessionHolder.getSession();
+            //            session = (XASession) sessionHolder.getSession();
+            session = (XAResource) sessionHolder.getSession();
 
             /*
              * We have no notion of flushing inside a JCR session if (transactionDefinition.isReadOnly() &&
@@ -158,18 +167,21 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         }
 
         catch (Exception ex) {
-            SessionFactoryUtils.releaseSession(session, getSessionFactory());
+            SessionFactoryUtils.releaseSession((Session) session, getSessionFactory());
             throw new CannotCreateTransactionException("Could not open JCR session for transaction", ex);
         }
     }
 
+    @Override
     protected Object doSuspend(Object transaction) {
         JcrTransactionObject txObject = (JcrTransactionObject) transaction;
         txObject.setSessionHolder(null, false);
-        SessionHolder sessionHolder = (UserTxSessionHolder) TransactionSynchronizationManager.unbindResource(getSessionFactory());
+        SessionHolder sessionHolder = (UserTxSessionHolder) TransactionSynchronizationManager
+                .unbindResource(getSessionFactory());
         return new SuspendedResourcesHolder(sessionHolder);
     }
 
+    @Override
     protected void doResume(Object transaction, Object suspendedResources) {
         SuspendedResourcesHolder resourcesHolder = (SuspendedResourcesHolder) suspendedResources;
         if (TransactionSynchronizationManager.hasResource(getSessionFactory())) {
@@ -182,10 +194,11 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         TransactionSynchronizationManager.bindResource(getSessionFactory(), resourcesHolder.getSessionHolder());
     }
 
+    @Override
     protected void doCommit(DefaultTransactionStatus status) {
         JcrTransactionObject txObject = (JcrTransactionObject) status.getTransaction();
         if (status.isDebug()) {
-            logger.debug("Committing JCR transaction on session [" + txObject.getSessionHolder().getSession() + "]");
+            LOG.debug("Committing JCR transaction on session [" + txObject.getSessionHolder().getSession() + "]");
         }
         try {
             txObject.getSessionHolder().getTransaction().commit();
@@ -195,10 +208,11 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         }
     }
 
+    @Override
     protected void doRollback(DefaultTransactionStatus status) {
         JcrTransactionObject txObject = (JcrTransactionObject) status.getTransaction();
         if (status.isDebug()) {
-            logger.debug("Rolling back JCR transaction on session [" + txObject.getSessionHolder().getSession() + "]");
+            LOG.debug("Rolling back JCR transaction on session [" + txObject.getSessionHolder().getSession() + "]");
         }
         try {
             txObject.getSessionHolder().getTransaction().rollback();
@@ -218,14 +232,17 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
         }
     }
 
+    @Override
     protected void doSetRollbackOnly(DefaultTransactionStatus status) {
         JcrTransactionObject txObject = (JcrTransactionObject) status.getTransaction();
         if (status.isDebug()) {
-            logger.debug("Setting JCR transaction on session [" + txObject.getSessionHolder().getSession() + "] rollback-only");
+            LOG.debug("Setting JCR transaction on session [" + txObject.getSessionHolder().getSession()
+                    + "] rollback-only");
         }
         txObject.setRollbackOnly();
     }
 
+    @Override
     protected void doCleanupAfterCompletion(Object transaction) {
         JcrTransactionObject txObject = (JcrTransactionObject) transaction;
 
@@ -236,13 +253,13 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
 
         Session session = txObject.getSessionHolder().getSession();
         if (txObject.isNewSessionHolder()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Closing JCR session [" + session + "] after transaction");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Closing JCR session [" + session + "] after transaction");
             }
             SessionFactoryUtils.releaseSession(session, sessionFactory);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Not closing pre-bound JCR session [" + session + "] after transaction");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Not closing pre-bound JCR session [" + session + "] after transaction");
             }
         }
         txObject.getSessionHolder().clear();
@@ -279,10 +296,12 @@ public class LocalTransactionManager extends AbstractPlatformTransactionManager 
             getSessionHolder().setRollbackOnly();
         }
 
+        @Override
         public boolean isRollbackOnly() {
             return getSessionHolder().isRollbackOnly();
         }
 
+        @Override
         public void flush() {
             sessionHolder.clear();
         }
