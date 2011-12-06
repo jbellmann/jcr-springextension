@@ -71,8 +71,15 @@ public interface JcrModel1Operations {
 
     /**
      * @see javax.jcr.Session#getNodeByUUID(java.lang.String)
+     * @deprecated use {@link #getNodeByIdentifier(String)}
      */
+    @Deprecated
     public Node getNodeByUUID(String uuid);
+
+    /**
+     * @see javax.jcr.Session#getNodeByIdentifier(java.lang.String)
+     */
+    public Node getNodeByIdentifier(String id);
 
     /**
      * @see javax.jcr.Session#getRootNode();
