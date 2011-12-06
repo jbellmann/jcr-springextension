@@ -40,14 +40,17 @@ public class JackrabbitNamespaceHandler extends NamespaceHandlerSupport {
 
     private static class JackrabbitRepositoryBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
 
-        protected Class getBeanClass(Element element) {
+        @Override
+        protected Class<RepositoryFactoryBean> getBeanClass(Element element) {
             return RepositoryFactoryBean.class;
         }
     }
 
-    private static class JackrabbitLocalTransactionManagerBeanDefinitionParser extends AbstractSimpleBeanDefinitionParser {
+    private static class JackrabbitLocalTransactionManagerBeanDefinitionParser extends
+            AbstractSimpleBeanDefinitionParser {
 
-        protected Class getBeanClass(Element element) {
+        @Override
+        protected Class<LocalTransactionManager> getBeanClass(Element element) {
             return LocalTransactionManager.class;
         }
     }
