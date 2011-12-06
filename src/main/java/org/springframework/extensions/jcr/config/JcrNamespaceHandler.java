@@ -41,6 +41,7 @@ public class JcrNamespaceHandler extends NamespaceHandlerSupport {
      * (non-Javadoc)
      * @see org.springframework.beans.factory.xml.NamespaceHandler#init()
      */
+    @Override
     public void init() {
         // registerBeanDefinitionParser("repository", new
         // JcrBeanDefinitionParser());
@@ -60,7 +61,8 @@ public class JcrNamespaceHandler extends NamespaceHandlerSupport {
          * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
          * #getBeanClass(org.w3c.dom.Element)
          */
-        protected Class getBeanClass(Element element) {
+        @Override
+        protected Class<EventListenerDefinition> getBeanClass(Element element) {
             return EventListenerDefinition.class;
         }
 
@@ -69,35 +71,41 @@ public class JcrNamespaceHandler extends NamespaceHandlerSupport {
          * @see org.springframework.beans.factory.xml.AbstractSimpleBeanDefinitionParser
          * #postProcess(org.springframework.beans.factory.support. BeanDefinitionBuilder, org.w3c.dom.Element)
          */
+        @Override
         protected void postProcess(BeanDefinitionBuilder definitionBuilder, Element element) {
-            List eventTypes = DomUtils.getChildElementsByTagName(element, EVENT_TYPE);
+            List<Element> eventTypes = DomUtils.getChildElementsByTagName(element, EVENT_TYPE);
             if (eventTypes != null && eventTypes.size() > 0) {
                 // compute event type
                 int eventType = 0;
                 Constants types = new Constants(Event.class);
-                for (Iterator iter = eventTypes.iterator(); iter.hasNext();) {
-                    Element evenTypeElement = (Element) iter.next();
+                for (Iterator<Element> iter = eventTypes.iterator(); iter.hasNext();) {
+                    Element evenTypeElement = iter.next();
                     eventType |= types.asNumber(DomUtils.getTextValue(evenTypeElement)).intValue();
                 }
-                definitionBuilder.addPropertyValue(EVENT_TYPE, new Integer(eventType));
+                definitionBuilder.addPropertyValue("eventTypes", new Integer(eventType));
             }
 
-            List nodeTypeNames = DomUtils.getChildElementsByTagName(element, NODE_TYPE_NAME);
+            List<Element> nodeTypeNames = DomUtils.getChildElementsByTagName(element, NODE_TYPE_NAME);
             String[] nodeTypeValues = new String[nodeTypeNames.size()];
 
             for (int i = 0; i < nodeTypeValues.length; i++) {
-                nodeTypeValues[i] = DomUtils.getTextValue((Element) nodeTypeNames.get(i));
+                nodeTypeValues[i] = DomUtils.getTextValue(nodeTypeNames.get(i));
             }
             definitionBuilder.addPropertyValue(NODE_TYPE_NAME, nodeTypeValues);
-            List uuids = DomUtils.getChildElementsByTagName(element, UUID);
+            List<Element> uuids = DomUtils.getChildElementsByTagName(element, UUID);
 
             String[] uuidsValues = new String[uuids.size()];
 
             for (int i = 0; i < uuidsValues.length; i++) {
-                uuidsValues[i] = DomUtils.getTextValue((Element) uuids.get(i));
+                uuidsValues[i] = DomUtils.getTextValue(uuids.get(i));
             }
 
             definitionBuilder.addPropertyValue(UUID, uuidsValues);
+            //TODO, reference a listenerBean, it is not a propertyReference
+            Element eventListner = DomUtils.getChildElementByTagName(element, "listener");
+            String listenerBeanRefName = DomUtils.getTextValue(eventListner);
+
+            definitionBuilder.addPropertyReference("listener", listenerBeanRefName);
         }
     }
 
@@ -107,7 +115,8 @@ public class JcrNamespaceHandler extends NamespaceHandlerSupport {
          * @see org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser
          * #getBeanClass(org.w3c.dom.Element)
          */
-        protected Class getBeanClass(Element element) {
+        @Override
+        protected Class<JcrSessionFactory> getBeanClass(Element element) {
             return JcrSessionFactory.class;
         }
     }
