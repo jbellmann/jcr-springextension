@@ -25,8 +25,6 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.jackrabbit.api.XASession;
-
 /**
  * JackRabbit User transaction (based on the XA Resource returned by JackRabbit).
  * <p/>
@@ -44,12 +42,14 @@ public class JackRabbitUserTransaction implements UserTransaction {
 
     /**
      * Create a new instance of this class. Takes a session as parameter.
-     * @param session session. If session is not of type {@link XASession}, an
+     * @param session session. If session is not of type {@link XAResource}, an
      *            <code>IllegalArgumentException</code> is thrown
      */
     public JackRabbitUserTransaction(Session session) {
-        if (session instanceof XASession) {
-            xares = ((XASession) session).getXAResource();
+        //        if (session instanceof XASession) {
+        //            xares = ((XASession) session).getXAResource();
+        if (session instanceof XAResource) {
+            xares = (XAResource) session;
         } else {
             throw new IllegalArgumentException("Session not of type XASession");
         }
@@ -58,6 +58,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#begin
      */
+    @Override
     public void begin() throws NotSupportedException, SystemException {
         if (status != Status.STATUS_NO_TRANSACTION) {
             throw new IllegalStateException("Transaction already active");
@@ -69,7 +70,8 @@ public class JackRabbitUserTransaction implements UserTransaction {
             status = Status.STATUS_ACTIVE;
 
         } catch (XAException e) {
-            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR="
+                    + e.errorCode);
             systemException.initCause(e);
             throw systemException;
         }
@@ -78,6 +80,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#commit
      */
+    @Override
     public void commit() throws IllegalStateException, RollbackException, SecurityException, SystemException {
 
         if (status != Status.STATUS_ACTIVE) {
@@ -103,7 +106,8 @@ public class JackRabbitUserTransaction implements UserTransaction {
                 throw rollbackException;
             }
 
-            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR="
+                    + e.errorCode);
             systemException.initCause(e);
             throw systemException;
         }
@@ -112,6 +116,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#getStatus
      */
+    @Override
     public int getStatus() throws SystemException {
         return status;
     }
@@ -119,6 +124,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#rollback
      */
+    @Override
     public void rollback() throws IllegalStateException, SecurityException, SystemException {
 
         if (status != Status.STATUS_ACTIVE && status != Status.STATUS_MARKED_ROLLBACK) {
@@ -134,7 +140,8 @@ public class JackRabbitUserTransaction implements UserTransaction {
             status = Status.STATUS_ROLLEDBACK;
 
         } catch (XAException e) {
-            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR=" + e.errorCode);
+            final SystemException systemException = new SystemException("Unable to commit transaction: " + "XA_ERR="
+                    + e.errorCode);
             systemException.initCause(e);
             throw systemException;
         }
@@ -143,6 +150,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#setRollbackOnly()
      */
+    @Override
     public void setRollbackOnly() throws IllegalStateException, SystemException {
         if (status != Status.STATUS_ACTIVE) {
             throw new IllegalStateException("Transaction not active");
@@ -153,6 +161,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
     /**
      * @see javax.transaction.UserTransaction#setTransactionTimeout
      */
+    @Override
     public void setTransactionTimeout(int seconds) throws SystemException {
     }
 
@@ -175,6 +184,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
         /**
          * @see javax.transaction.xa.Xid#getFormatId()
          */
+        @Override
         public int getFormatId() {
             return 0;
         }
@@ -182,6 +192,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
         /**
          * @see javax.transaction.xa.Xid#getBranchQualifier()
          */
+        @Override
         public byte[] getBranchQualifier() {
             return new byte[0];
         }
@@ -189,6 +200,7 @@ public class JackRabbitUserTransaction implements UserTransaction {
         /**
          * @see javax.transaction.xa.Xid#getGlobalTransactionId()
          */
+        @Override
         public byte[] getGlobalTransactionId() {
             return globalTxId;
         }

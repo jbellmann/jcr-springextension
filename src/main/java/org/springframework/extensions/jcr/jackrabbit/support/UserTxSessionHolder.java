@@ -17,8 +17,8 @@ package org.springframework.extensions.jcr.jackrabbit.support;
 
 import javax.jcr.Session;
 import javax.transaction.UserTransaction;
+import javax.transaction.xa.XAResource;
 
-import org.apache.jackrabbit.api.XASession;
 import org.springframework.extensions.jcr.SessionHolder;
 
 /**
@@ -50,6 +50,7 @@ public class UserTxSessionHolder extends SessionHolder {
     /**
      * @see org.springframework.extensions.jcr.SessionHolder#setSession(javax.jcr.Session)
      */
+    @Override
     public void setSession(Session session) {
         /*
          * if (!(session instanceof XASession)) throw new IllegalArgumentException( "Session not of type
@@ -57,7 +58,10 @@ public class UserTxSessionHolder extends SessionHolder {
          */
 
         // when using JCA we have another session type
-        if (session instanceof XASession) {
+        //        if (session instanceof XASession) {
+        //            transaction = new JackRabbitUserTransaction(session);
+        //        }
+        if (session instanceof XAResource) {
             transaction = new JackRabbitUserTransaction(session);
         }
         super.setSession(session);
@@ -66,6 +70,7 @@ public class UserTxSessionHolder extends SessionHolder {
     /**
      * @see org.springframework.transaction.support.ResourceHolderSupport#clear()
      */
+    @Override
     public void clear() {
         super.clear();
         transaction = null;
