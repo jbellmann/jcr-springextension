@@ -15,7 +15,10 @@
  */
 package org.springframework.extensions.jcr.support;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertSame;
 
 import java.util.ArrayList;
@@ -23,8 +26,6 @@ import java.util.List;
 
 import javax.jcr.Repository;
 import javax.jcr.Session;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ public class AbstractSessionHolderProviderManagerTest {
         repositoryName = "dummyRepository";
 
         providerManager = new AbstractSessionHolderProviderManager() {
+            @Override
             public List<SessionHolderProvider> getProviders() {
                 return providers;
             }
@@ -70,6 +72,7 @@ public class AbstractSessionHolderProviderManagerTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
              */
+            @Override
             public boolean acceptsRepository(String repo) {
                 return repositoryName.equals(repo);
             }
@@ -77,6 +80,7 @@ public class AbstractSessionHolderProviderManagerTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
              */
+            @Override
             public SessionHolder createSessionHolder(Session session) {
                 return null;
             }
@@ -131,6 +135,7 @@ public class AbstractSessionHolderProviderManagerTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#acceptsRepository(java.lang.String)
              */
+            @Override
             public boolean acceptsRepository(String repo) {
                 return false;
             }
@@ -138,6 +143,7 @@ public class AbstractSessionHolderProviderManagerTest {
             /**
              * @see org.springframework.extensions.jcr.SessionHolderProvider#createSessionHolder(javax.jcr.Session)
              */
+            @Override
             public SessionHolder createSessionHolder(Session session) {
                 return null;
             }

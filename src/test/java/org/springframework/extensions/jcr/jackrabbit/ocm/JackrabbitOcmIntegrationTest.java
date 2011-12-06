@@ -16,21 +16,18 @@
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
+import static org.junit.Assert.fail;
 
+import java.util.Date;
+
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.extensions.jcr.jackrabbit.ocm.components.ArticleService;
 import org.springframework.extensions.jcr.jackrabbit.ocm.components.NewsService;
 import org.springframework.extensions.jcr.jackrabbit.ocm.model.Article;
 import org.springframework.extensions.jcr.jackrabbit.ocm.model.News;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
-
-import static org.junit.Assert.fail;
 
 /**
  * Test Mapper
@@ -46,7 +43,7 @@ public class JackrabbitOcmIntegrationTest extends AbstractJUnit4SpringContextTes
     @Autowired
     private NewsService newsService;
 
-    @org.junit.Test
+    @Test
     public void testComponents() {
         try {
             logger.info("Add article");

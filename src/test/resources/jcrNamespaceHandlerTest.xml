@@ -5,8 +5,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springsource.org/extensions/se-jcr/schema/jcr ./org/springframework/extensions/jcr/config/se-jcr.xsd">
 
-	<jcr:eventListenerDefinition id="eventListenerFull" absPath="/somePath" isDeep="true" noLocal="false">
-		<jcr:listener>some bean</jcr:listener>
+	<jcr:eventListenerDefinition id="eventListenerFull" absPath="/somePath" deep="true" noLocal="false">
+		<jcr:listener>testEventListenerBean</jcr:listener>
 		<jcr:uuid>123</jcr:uuid>
 		<jcr:nodeTypeName>foo</jcr:nodeTypeName>
 		<jcr:nodeTypeName>bar</jcr:nodeTypeName>
@@ -18,4 +18,6 @@
 		<jcr:namespace name="foo">http://bar.com/jcr</jcr:namespace>
 		<jcr:namespace name="hocus">http://pocus.com/jcr</jcr:namespace>
 	</jcr:sessionFactory>
+  
+    <bean id="testEventListenerBean" class="org.springframework.extensions.jcr.config.TestEventListener"/>
 </beans>

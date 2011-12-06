@@ -28,8 +28,6 @@ import java.lang.reflect.Method;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import junit.framework.TestCase;
-
 import org.aopalliance.intercept.Interceptor;
 import org.aopalliance.intercept.Invocation;
 import org.aopalliance.intercept.MethodInvocation;
@@ -91,12 +89,13 @@ public class JcrInterceptorTest {
 
     private static class TestInvocation implements MethodInvocation {
 
-        private SessionFactory sessionFactory;
+        private final SessionFactory sessionFactory;
 
         public TestInvocation(SessionFactory sessionFactory) {
             this.sessionFactory = sessionFactory;
         }
 
+        @Override
         public Object proceed() throws Throwable {
             if (!TransactionSynchronizationManager.hasResource(this.sessionFactory)) {
                 throw new IllegalStateException("Session not bound");
@@ -104,6 +103,7 @@ public class JcrInterceptorTest {
             return null;
         }
 
+        @Override
         public Object[] getArguments() {
             return null;
         }
@@ -120,10 +120,12 @@ public class JcrInterceptorTest {
             return null;
         }
 
+        @Override
         public Method getMethod() {
             return null;
         }
 
+        @Override
         public AccessibleObject getStaticPart() {
             return getMethod();
         }
@@ -139,6 +141,7 @@ public class JcrInterceptorTest {
             return 0;
         }
 
+        @Override
         public Object getThis() {
             return null;
         }

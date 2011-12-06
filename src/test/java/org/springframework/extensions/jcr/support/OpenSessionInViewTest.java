@@ -21,7 +21,10 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -30,8 +33,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.springframework.extensions.jcr.SessionFactory;
@@ -172,7 +173,9 @@ public class OpenSessionInViewTest {
         filter3.init(filterConfig3);
 
         final FilterChain filterChain = new FilterChain() {
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException,
+                    ServletException {
                 assertTrue(TransactionSynchronizationManager.hasResource(sessionFactory));
                 // check sf-related things
                 assertSame(holder, TransactionSynchronizationManager.getResource(sessionFactory));
@@ -183,7 +186,9 @@ public class OpenSessionInViewTest {
         };
 
         final FilterChain filterChain2 = new FilterChain() {
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException,
+                    ServletException {
                 assertTrue(TransactionSynchronizationManager.hasResource(sessionFactory));
                 // check sf-related things
                 assertSame(holder, TransactionSynchronizationManager.getResource(sessionFactory));
@@ -194,7 +199,9 @@ public class OpenSessionInViewTest {
         };
 
         final FilterChain filterChain3 = new FilterChain() {
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException,
+                    ServletException {
                 assertTrue(TransactionSynchronizationManager.hasResource(sessionFactory2));
                 // check sf2-related things
                 assertSame(holder2, TransactionSynchronizationManager.getResource(sessionFactory2));
@@ -205,7 +212,9 @@ public class OpenSessionInViewTest {
         };
 
         FilterChain filterChain4 = new FilterChain() {
-            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException, ServletException {
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse) throws IOException,
+                    ServletException {
                 filter2.doFilter(servletRequest, servletResponse, filterChain3);
             }
         };

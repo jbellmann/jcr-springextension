@@ -1,35 +1,17 @@
-/**
- * Copyright 2009 the original author or authors
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.apache.jackrabbit.api.XASession;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.extensions.jcr.JcrCallback;
 import org.springframework.extensions.jcr.JcrTemplate;
 import org.springframework.extensions.jcr.SessionFactory;
@@ -44,41 +26,34 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * @author Costin Leau
- * @author Sergio Bossa
- * @author Salvatore Incandela
  * 
- * see {@link LocalTransactionManager2Test}
+ * @author Joerg Bellmann
+ *
  */
-@Ignore
-public class LocalTransactionManagerTest {
+public class LocalTransactionManager2Test {
 
-    /**
-     * see {@link LocalTransactionManager2Test#testTransactionCommit()}
-     * @throws Exception
-     */
+    private final SessionFactory sessionFactory = Mockito.mock(SessionFactory.class);
+    private final Session session = Mockito.mock(Session.class, Mockito.withSettings()
+            .extraInterfaces(XAResource.class));
+
+    @Before
+    public void setUp() throws RepositoryException, XAException {
+        Mockito.when(sessionFactory.getSession()).thenReturn(session);
+    }
+
     @Test
-    @Ignore
-    public void testTransactionCommit() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        // create nice mock
-        XAResource xaResource = createMock(XAResource.class);
+    public void testTransactionCommit() throws RepositoryException, XAException {
+        Mockito.when(((XAResource) session).prepare(Mockito.any(Xid.class))).thenReturn(0);
 
-        expect(sessionFactory.getSession()).andReturn(xaSession);
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-
-        xaSession.save();
-        xaSession.logout();
+        //do not know why the following two methods on session are called, it is a mock, nobody cares
+        session.save();
+        session.logout();
 
         Xid xidMock = new XidMock();
 
-        xaResource.start(xidMock, XAResource.TMNOFLAGS);
-        expect(xaResource.prepare(xidMock)).andReturn(0);
-        xaResource.commit(xidMock, false);
-        xaResource.end(xidMock, XAResource.TMSUCCESS);
-
-        replay(sessionFactory, xaSession, xaResource);
+        ((XAResource) session).start(xidMock, XAResource.TMNOFLAGS);
+        ((XAResource) session).commit(xidMock, false);
+        ((XAResource) session).end(xidMock, XAResource.TMSUCCESS);
 
         PlatformTransactionManager tm = new LocalTransactionManager(sessionFactory);
         TransactionTemplate tt = new TransactionTemplate(tm);
@@ -93,37 +68,19 @@ public class LocalTransactionManagerTest {
                 template.save();
             }
         });
-
-        assertTrue("Hasn't thread session", !TransactionSynchronizationManager.hasResource(sessionFactory));
-        assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
-
-        verify(sessionFactory, xaResource, xaSession);
     }
 
-    /**
-     * see {@link LocalTransactionManager2Test#testTransactionRollback()}
-     * @throws Exception
-     */
     @Test
-    @Ignore
-    public void testTransactionRollback() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        XAResource xaResource = createMock(XAResource.class);
-
-        expect(sessionFactory.getSession()).andReturn(xaSession);
-
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-        xaSession.save();
-        xaSession.logout();
+    public void testTransactionRollback() throws RepositoryException, XAException {
+        //do not know why the following two methods on session are called, it is a mock, nobody cares
+        session.save();
+        session.logout();
 
         Xid xidMock = new XidMock();
 
-        xaResource.start(xidMock, XAResource.TMNOFLAGS);
-        xaResource.end(xidMock, XAResource.TMFAIL);
-        xaResource.rollback(xidMock);
-
-        replay(sessionFactory, xaSession, xaResource);
+        ((XAResource) session).start(xidMock, XAResource.TMNOFLAGS);
+        ((XAResource) session).end(xidMock, XAResource.TMFAIL);
+        ((XAResource) session).rollback(xidMock);
 
         PlatformTransactionManager tm = new LocalTransactionManager(sessionFactory);
         TransactionTemplate tt = new TransactionTemplate(tm);
@@ -152,28 +109,18 @@ public class LocalTransactionManagerTest {
         assertTrue("Hasn't thread session", !TransactionSynchronizationManager.hasResource(sessionFactory));
         assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
 
-        verify(sessionFactory, xaSession, xaResource);
     }
 
     @Test
     public void testTransactionRollbackOnly() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        XAResource xaResource = createMock(XAResource.class);
-
-        expect(sessionFactory.getSession()).andReturn(xaSession);
-
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-        xaSession.save();
-        xaSession.logout();
+        session.save();
+        session.logout();
 
         Xid xidMock = new XidMock();
 
-        xaResource.start(xidMock, XAResource.TMNOFLAGS);
-        xaResource.end(xidMock, XAResource.TMFAIL);
-        xaResource.rollback(xidMock);
-
-        replay(sessionFactory, xaSession, xaResource);
+        ((XAResource) session).start(xidMock, XAResource.TMNOFLAGS);
+        ((XAResource) session).end(xidMock, XAResource.TMFAIL);
+        ((XAResource) session).rollback(xidMock);
 
         PlatformTransactionManager transactionManager = new LocalTransactionManager(sessionFactory);
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -199,16 +146,10 @@ public class LocalTransactionManagerTest {
 
         assertTrue("Hasn't thread session", !TransactionSynchronizationManager.hasResource(sessionFactory));
         assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
-
-        verify(sessionFactory, xaSession, xaResource);
     }
 
     @Test
-    public void testInvalidIsolation() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-
-        replay(sessionFactory);
-
+    public void testInavlidIsolation() {
         PlatformTransactionManager transactionManager = new LocalTransactionManager(sessionFactory);
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 
@@ -238,24 +179,13 @@ public class LocalTransactionManagerTest {
 
         assertTrue("Hasn't thread session", !TransactionSynchronizationManager.hasResource(sessionFactory));
         assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
-
-        verify(sessionFactory);
     }
 
     @Test
     public void testTransactionCommitWithPrebound() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        XAResource xaResource = createMock(XAResource.class);
-
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-        xaSession.save();
-
-        replay(sessionFactory, xaSession, xaResource);
-
         PlatformTransactionManager transactionManager = new LocalTransactionManager(sessionFactory);
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        UserTxSessionHolder userTransaction = new UserTxSessionHolder(xaSession);
+        UserTxSessionHolder userTransaction = new UserTxSessionHolder(session);
         TransactionSynchronizationManager.bindResource(sessionFactory, userTransaction);
 
         assertTrue("Has thread session", TransactionSynchronizationManager.hasResource(sessionFactory));
@@ -272,24 +202,13 @@ public class LocalTransactionManagerTest {
         assertTrue("Has thread session", TransactionSynchronizationManager.hasResource(sessionFactory));
         TransactionSynchronizationManager.unbindResource(sessionFactory);
         assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
-
-        verify(sessionFactory, xaSession, xaResource);
     }
 
     @Test
     public void testTransactionRollbackOnlyWithPrebound() throws Exception {
-        final SessionFactory sessionFactory = createMock(SessionFactory.class);
-        final XASession xaSession = createMock(XASession.class);
-        XAResource xaResource = createMock(XAResource.class);
-
-        expect(xaSession.getXAResource()).andReturn(xaResource);
-        xaSession.save();
-
-        replay(sessionFactory, xaSession, xaResource);
-
         PlatformTransactionManager transactionManager = new LocalTransactionManager(sessionFactory);
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        UserTxSessionHolder userTransaction = new UserTxSessionHolder(xaSession);
+        UserTxSessionHolder userTransaction = new UserTxSessionHolder(session);
         TransactionSynchronizationManager.bindResource(sessionFactory, userTransaction);
 
         assertTrue("Has thread session", TransactionSynchronizationManager.hasResource(sessionFactory));
@@ -312,8 +231,5 @@ public class LocalTransactionManagerTest {
         assertTrue("Has thread session", TransactionSynchronizationManager.hasResource(sessionFactory));
         TransactionSynchronizationManager.unbindResource(sessionFactory);
         assertTrue("JTA synchronizations not active", !TransactionSynchronizationManager.isSynchronizationActive());
-
-        verify(sessionFactory, xaSession, xaResource);
     }
-
 }

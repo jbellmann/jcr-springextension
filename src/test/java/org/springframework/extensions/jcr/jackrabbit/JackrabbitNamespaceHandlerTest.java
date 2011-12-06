@@ -15,16 +15,15 @@
  */
 package org.springframework.extensions.jcr.jackrabbit;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * @author Costin Leau
@@ -33,15 +32,19 @@ import static org.junit.Assert.assertSame;
  */
 public class JackrabbitNamespaceHandlerTest {
 
-    private XmlBeanFactory beanFactory;
+    private DefaultListableBeanFactory beanFactory;
+    private XmlBeanDefinitionReader beanDefinitionReader;
 
     @Before
     public void setUp() throws Exception {
-        this.beanFactory = new XmlBeanFactory(new ClassPathResource("jackrabbitNamespaceHandlerTest.xml"));
+        beanFactory = new DefaultListableBeanFactory();
+        beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        beanDefinitionReader.loadBeanDefinitions(new ClassPathResource("jackrabbitNamespaceHandlerTest.xml"));
     }
 
     private void assertPropertyValue(BeanDefinition beanDefinition, String propertyName, Object expectedValue) {
-        assertEquals("Property [" + propertyName + "] incorrect.", expectedValue, beanDefinition.getPropertyValues().getPropertyValue(propertyName).getValue());
+        assertEquals("Property [" + propertyName + "] incorrect.", expectedValue, beanDefinition.getPropertyValues()
+                .getPropertyValue(propertyName).getValue());
     }
 
     @Test

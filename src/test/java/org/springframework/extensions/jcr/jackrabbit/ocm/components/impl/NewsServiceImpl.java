@@ -16,6 +16,8 @@
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm.components.impl;
 
+import java.util.Collection;
+
 import org.apache.jackrabbit.ocm.query.Filter;
 import org.apache.jackrabbit.ocm.query.Query;
 import org.apache.jackrabbit.ocm.query.QueryManager;
@@ -28,8 +30,6 @@ import org.springframework.extensions.jcr.jackrabbit.ocm.model.News;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
 
 /**
  * Default implementation for {@link org.springframework.extensions.jcr.jackrabbit.ocm.components.ArticleService}
@@ -49,19 +49,22 @@ public class NewsServiceImpl implements NewsService {
         this.jcrMappingtemplate = template;
     }
 
+    @Override
     public void createNews(News news) {
         jcrMappingtemplate.insert(news);
         jcrMappingtemplate.save();
+        logger.debug("An news has been created on path {}", news.getPath());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Collection<News> getNews() {
-        
+
         QueryManager queryManager = jcrMappingtemplate.createQueryManager();
         Filter filter = queryManager.createFilter(News.class);
 
         Query query = queryManager.createQuery(filter);
-        return (Collection<News>) jcrMappingtemplate.getObjects(query);
+        return jcrMappingtemplate.getObjects(query);
     }
 }

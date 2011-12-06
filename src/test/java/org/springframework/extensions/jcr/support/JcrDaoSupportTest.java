@@ -26,8 +26,6 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,7 +67,8 @@ public class JcrDaoSupportTest {
 
         replay(sessionFactory, session);
 
-        JcrDaoSupport dao = new JcrDaoSupport(){};
+        JcrDaoSupport dao = new JcrDaoSupport() {
+        };
 
         dao.setSessionFactory(sessionFactory);
         dao.afterPropertiesSet();
@@ -156,7 +155,7 @@ public class JcrDaoSupportTest {
         dao.releaseSession(session);
     }
 
-    @Test 
+    @Test
     public void testConvertException() {
         JcrDaoSupport dao = new JcrDaoSupport() {
         };

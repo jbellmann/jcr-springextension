@@ -26,9 +26,8 @@ import java.util.List;
 
 import javax.transaction.xa.XAResource;
 
-import junit.framework.TestCase;
-
 import org.apache.jackrabbit.api.XASession;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.extensions.jcr.JcrInterceptor;
 import org.springframework.extensions.jcr.SessionFactory;
@@ -37,6 +36,14 @@ import org.springframework.extensions.jcr.SessionHolderProvider;
 import org.springframework.extensions.jcr.jackrabbit.support.JackRabbitSessionHolderProvider;
 import org.springframework.extensions.jcr.support.ListSessionHolderProviderManager;
 
+/**
+ * 
+ * @author Joerg Bellmann
+ * 
+ * see {@link JcrInterceptor2Test#testCreateSessionHolder()}
+ *
+ */
+@Ignore
 public class JcrInterceptorTest {
 
     /*

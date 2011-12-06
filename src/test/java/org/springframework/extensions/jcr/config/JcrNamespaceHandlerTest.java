@@ -15,31 +15,35 @@
  */
 package org.springframework.extensions.jcr.config;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.extensions.jcr.EventListenerDefinition;
 import org.springframework.extensions.jcr.JcrSessionFactory;
 import org.springframework.util.ObjectUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 public class JcrNamespaceHandlerTest {
-    private XmlBeanFactory beanFactory;
+
+    private DefaultListableBeanFactory beanFactory;
+    private XmlBeanDefinitionReader beanDefinitionReader;
 
     @Before
     public void setUp() throws Exception {
-        this.beanFactory = new XmlBeanFactory(new ClassPathResource("jcrNamespaceHandlerTest.xml"));
+        beanFactory = new DefaultListableBeanFactory();
+        beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+        beanDefinitionReader.loadBeanDefinitions(new ClassPathResource("jcrNamespaceHandlerTest.xml"));
     }
 
     private void assertPropertyValue(BeanDefinition beanDefinition, String propertyName, Object expectedValue) {
-        assertEquals("Property [" + propertyName + "] incorrect.", expectedValue, getPropertyValue(beanDefinition, propertyName));
+        assertEquals("Property [" + propertyName + "] incorrect.", expectedValue,
+                getPropertyValue(beanDefinition, propertyName));
     }
 
     private Object getPropertyValue(BeanDefinition beanDefinition, String propertyName) {
@@ -51,11 +55,12 @@ public class JcrNamespaceHandlerTest {
         BeanDefinition beanDefinition = this.beanFactory.getBeanDefinition("eventListenerFull");
         assertSame(EventListenerDefinition.class.getName(), beanDefinition.getBeanClassName());
         assertPropertyValue(beanDefinition, "absPath", "/somePath");
-        assertPropertyValue(beanDefinition, "isDeep", "true");
+        assertPropertyValue(beanDefinition, "deep", "true");
         assertPropertyValue(beanDefinition, "noLocal", "false");
-        assertPropertyValue(beanDefinition, "eventType", 17);
+        assertPropertyValue(beanDefinition, "eventTypes", 17);
         assertTrue(ObjectUtils.nullSafeEquals(new String[] { "123" }, getPropertyValue(beanDefinition, "uuid")));
-        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "foo", "bar" }, getPropertyValue(beanDefinition, "nodeTypeName")));
+        assertTrue(ObjectUtils.nullSafeEquals(new String[] { "foo", "bar" },
+                getPropertyValue(beanDefinition, "nodeTypeName")));
     }
 
     @Test

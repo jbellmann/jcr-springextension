@@ -16,6 +16,9 @@
  */
 package org.springframework.extensions.jcr.jackrabbit.ocm.components.impl;
 
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.jackrabbit.ocm.query.Filter;
 import org.apache.jackrabbit.ocm.query.Query;
 import org.apache.jackrabbit.ocm.query.QueryManager;
@@ -30,9 +33,6 @@ import org.springframework.extensions.jcr.jackrabbit.ocm.model.News;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * Default implementation for
@@ -53,18 +53,21 @@ public class ArticleServiceImpl implements ArticleService {
         this.newsService = newsService;
     }
 
+    @Override
     public void createArticle(Article article) {
 
         jcrMappingtemplate.insert(article);
         jcrMappingtemplate.save();
-
+        logger.debug("A new article has been created by " + article.getAuthor());
         News news = new News();
         news.setContent("A new article has been created by " + article.getAuthor());
         news.setCreationDate(new Date());
         news.setPath("/news-" + System.currentTimeMillis());
         newsService.createNews(news);
+
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public Collection<Article> getArticles() {
