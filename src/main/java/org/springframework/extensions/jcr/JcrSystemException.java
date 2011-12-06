@@ -25,6 +25,7 @@ import org.springframework.dao.UncategorizedDataAccessException;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
+@SuppressWarnings("serial")
 public class JcrSystemException extends UncategorizedDataAccessException {
 
     public JcrSystemException(String message, Throwable ex) {
