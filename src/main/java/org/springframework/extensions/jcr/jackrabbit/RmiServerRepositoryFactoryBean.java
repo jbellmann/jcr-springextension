@@ -32,19 +32,25 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
  * @author Sergio Bossa
  * @author Salvatore Incandela
  */
-@SuppressWarnings("unchecked")
-public class RmiServerRepositoryFactoryBean extends AbstractFactoryBean {
+//@SuppressWarnings("unchecked")
+public class RmiServerRepositoryFactoryBean extends AbstractFactoryBean<RemoteRepository> {
+
     private RemoteRepository remoteRepository;
+
     private Repository repository;
+
     private RemoteAdapterFactory remoteAdapterFactory;
+
     private Registry registry;
+
     private String rmiName;
 
     /*
      * (non-Javadoc)
      * @see org.springframework.beans.factory.config.AbstractFactoryBean#createInstance ()
      */
-    protected Object createInstance() throws Exception {
+    @Override
+    protected RemoteRepository createInstance() throws Exception {
         if (repository == null)
             throw new IllegalArgumentException("repository property is required");
         if (remoteAdapterFactory == null)
@@ -65,8 +71,10 @@ public class RmiServerRepositoryFactoryBean extends AbstractFactoryBean {
      * (non-Javadoc)
      * @see org.springframework.beans.factory.FactoryBean#getObjectType()
      */
-    public Class getObjectType() {
-        return (remoteRepository == null ? RemoteRepository.class : remoteRepository.getClass());
+    @Override
+    public Class<RemoteRepository> getObjectType() {
+        //        return (remoteRepository == null ? RemoteRepository.class : remoteRepository.getClass());
+        return RemoteRepository.class;
     }
 
     /**
