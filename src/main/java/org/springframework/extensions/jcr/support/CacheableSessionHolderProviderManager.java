@@ -34,7 +34,10 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
      * @author Sergio Bossa
      * @author Salvatore Incandela
      */
-    protected class ProvidersCache extends CachingMapDecorator {
+    protected class ProvidersCache extends CachingMapDecorator<Repository, SessionHolderProvider> {
+
+        private static final long serialVersionUID = 1L;
+
         private ProvidersCache() {
             super(true);
         }
@@ -42,8 +45,9 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
         /**
          * @see org.springframework.util.CachingMapDecorator#create(java.lang.Object)
          */
-        protected Object create(Object key) {
-            return parentLookup((Repository) key);
+        @Override
+        protected SessionHolderProvider create(Repository key) {
+            return parentLookup(key);
         }
 
     }
@@ -66,8 +70,9 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
      * Overwrite the method to provide caching.
      * @see org.springframework.extensions.jcr.support.AbstractSessionHolderProviderManager#getSessionProvider(Repository)
      */
+    @Override
     public SessionHolderProvider getSessionProvider(Repository repository) {
-        return (SessionHolderProvider) providersCache.get(repository);
+        return providersCache.get(repository);
     }
 
 }
