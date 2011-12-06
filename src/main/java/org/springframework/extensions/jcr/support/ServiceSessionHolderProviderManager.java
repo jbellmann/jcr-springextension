@@ -19,20 +19,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.springframework.extensions.jcr.SessionHolderProvider;
-
-import sun.misc.Service;
-import sun.misc.ServiceConfigurationError;
 
 /**
  * Implementation of SessionHolderProviderManager which does dynamic discovery of the providers using the JDK
  * 1.5+ <a href= "http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> 'Service
  * Provider' specification</a>. The class will look for
  * org.springframework.extensions.jcr.SessionHolderProvider property files in META-INF/services directories.
+ * 
+ * Updated to use {@link java.util.ServiceLoader} to avoid restricted access to sun.com.**
+ * 
  * @author Costin Leau
  * @author Sergio Bossa
  * @author Salvatore Incandela
+ * @author Joerg Bellmann
  */
 public class ServiceSessionHolderProviderManager extends CacheableSessionHolderProviderManager {
 
@@ -40,17 +42,15 @@ public class ServiceSessionHolderProviderManager extends CacheableSessionHolderP
      * Loads the service providers using the discovery mechanism.
      * @return the list of service providers found.
      */
-    @SuppressWarnings("unchecked")
+    @Override
     public List<SessionHolderProvider> getProviders() {
-        Iterator<SessionHolderProvider> providersIterator = Service.providers(SessionHolderProvider.class, Thread.currentThread().getContextClassLoader());
+        final ServiceLoader<SessionHolderProvider> serviceLoader = ServiceLoader.load(SessionHolderProvider.class,
+                Thread.currentThread().getContextClassLoader());
+
         List<SessionHolderProvider> providers = new ArrayList<SessionHolderProvider>();
-        while (providersIterator.hasNext()) {
-            try {
-                providers.add(providersIterator.next());
-            } catch (ServiceConfigurationError sce) {
-                if (!(sce.getCause() instanceof SecurityException))
-                    throw sce;
-            }
+        Iterator<SessionHolderProvider> sessionHolderProviderIterator = serviceLoader.iterator();
+        while (sessionHolderProviderIterator.hasNext()) {
+            providers.add(sessionHolderProviderIterator.next());
         }
         return Collections.unmodifiableList(providers);
     }
