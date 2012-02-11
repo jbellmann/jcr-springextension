@@ -27,9 +27,9 @@ import org.slf4j.LoggerFactory;
  * @author Joerg Bellmann
  *
  */
-public class TestEventListener implements EventListener {
+public class ExampleEventListener implements EventListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestEventListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleEventListener.class);
 
     @Override
     public void onEvent(EventIterator events) {

@@ -19,5 +19,5 @@
 		<jcr:namespace name="hocus">http://pocus.com/jcr</jcr:namespace>
 	</jcr:sessionFactory>
   
-    <bean id="testEventListenerBean" class="org.springframework.extensions.jcr.config.TestEventListener"/>
+    <bean id="testEventListenerBean" class="org.springframework.extensions.jcr.config.ExampleEventListener"/>
 </beans>
