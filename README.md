@@ -35,4 +35,3 @@ Not yet.
 I issued that at the [Issue-Tracker](https://jira.springsource.org/browse/SEJCR-21). But got no answer from the team.
 So to work on it I put the code here and if someone at SpringSource feels responsible for this project we can move it to an official github-repo at SpringSource.
 
-t
