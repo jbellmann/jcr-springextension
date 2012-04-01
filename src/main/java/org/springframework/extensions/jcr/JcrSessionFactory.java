@@ -132,6 +132,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     public JcrSessionFactory() {
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(getRepository(), "repository is required");
 
@@ -140,7 +141,6 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
 
         registerNamespaces();
         registerNodeTypes();
-        
 
         // determine the session holder provider
         if (sessionHolderProviderManager == null) {
@@ -215,10 +215,10 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
         }
 
         // do the registration
-        for (Map.Entry entry : namespaces.entrySet()) {
-            Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
-            String prefix = namespace.getKey();
-            String ns = namespace.getValue();
+        for (Map.Entry<?, ?> entry : namespaces.entrySet()) {
+            //            Map.Entry<String, String> namespace = (Map.Entry<String, String>) entry;
+            String prefix = (String) entry.getKey();
+            String ns = (String) entry.getValue();
 
             int position = Arrays.binarySearch(prefixes, prefix);
 
@@ -236,6 +236,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see org.springframework.beans.factory.DisposableBean#destroy()
      */
+    @Override
     public void destroy() throws Exception {
         unregisterNodeTypes();
         unregisterNamespaces();
@@ -278,6 +279,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see org.springframework.extensions.jcr.SessionFactory#getSession()
      */
+    @Override
     public Session getSession() throws RepositoryException {
         Session session = repository.login(credentials, workspaceName);
         return addListeners(session);
@@ -286,6 +288,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see org.springframework.extensions.jcr.SessionFactory#getSessionHolder(javax.jcr.Session)
      */
+    @Override
     public SessionHolder getSessionHolder(Session session) {
         return sessionHolderProvider.createSessionHolder(session);
     }
@@ -305,8 +308,8 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
                 LOG.debug("adding listeners " + Arrays.asList(eventListeners).toString() + " for session " + session);
 
             for (int i = 0; i < eventListeners.length; i++) {
-                manager.addEventListener(eventListeners[i].getListener(), eventListeners[i].getEventTypes(), eventListeners[i].getAbsPath(), eventListeners[i].isDeep(), eventListeners[i].getUuid(),
-                        eventListeners[i].getNodeTypeName(), eventListeners[i].isNoLocal());
+                manager.addEventListener(eventListeners[i].getListener(), eventListeners[i].getEventTypes(), eventListeners[i].getAbsPath(),
+                        eventListeners[i].isDeep(), eventListeners[i].getUuid(), eventListeners[i].getNodeTypeName(), eventListeners[i].isNoLocal());
             }
         }
         return session;
@@ -343,6 +346,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -355,6 +359,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + repository.hashCode();
@@ -370,6 +375,7 @@ public class JcrSessionFactory implements InitializingBean, DisposableBean, Sess
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("SessionFactory for ");

@@ -138,7 +138,7 @@ public interface JcrModel1Operations {
      * @param list a list of queries that will be executed against the repository
      * @return a map containing the queries as keys and results as values
      */
-    public Map query(final List list);
+    public Map<String, QueryResult> query(final List<String> list);
 
     /**
      * Utility method for executing a list of queries against the repository. Reads the queries given and

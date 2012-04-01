@@ -298,6 +298,7 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
         return getNodeByIdentifier(uuid);
     }
 
+    @Override
     public Node getNodeByIdentifier(final String id) {
         return execute(new JcrCallback<Node>() {
             /**
@@ -673,7 +674,7 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      * @see org.springframework.extensions.jcr.JcrOperations#query(java.util.List)
      */
     @Override
-    public Map query(final List list) {
+    public Map<String, QueryResult> query(final List<String> list) {
         return query(list, null, false);
     }
 
@@ -748,8 +749,7 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      * @see javax.jcr.Session#logout()
      */
     protected Session createSessionProxy(Session session) {
-        return (Session) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { Session.class },
-                new LogoutSuppressingInvocationHandler(session));
+        return (Session) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] {Session.class}, new LogoutSuppressingInvocationHandler(session));
     }
 
     /**
