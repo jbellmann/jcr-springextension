@@ -37,7 +37,7 @@
     <!-- lets start with 1.5 and up to 2.0 -->
     <jackrabbit.version.range>[2.3, 2.5]</jackrabbit.version.range>
     <jackrabbit.version>2.4.1</jackrabbit.version>
-    <spring.version>3.1.0.RELEASE</spring.version>
+    <spring.version>3.1.1.RELEASE</spring.version>
     <junit.version>4.10</junit.version>
     <easymock.version>2.5.2</easymock.version>
     <easymockclassextension.version>2.4</easymockclassextension.version>
