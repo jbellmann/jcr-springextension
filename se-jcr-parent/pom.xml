@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework</groupId>
-  <artifactId>se-jcr</artifactId>
+  <artifactId>se-jcr-parent</artifactId>
   <packaging>pom</packaging>
   <version>2.0-SNAPSHOT</version>
   <name>Spring Extension JCR -- ${project.artifactId}</name>
@@ -28,13 +28,6 @@
       <url>svn:https://src.springframework.org/svn/se-jcr/repo</url>
     </repository>
   </distributionManagement>
-
-    <modules>
-        <module>se-jcr-parent</module>
-        <module>se-jcr-commons</module>
-        <module>se-jcr-jackrabbit</module>
-        <module>se-jcr-jackrabbit-ocm</module>
-    </modules>
 
   <properties>
     <bundlor.enabled>true</bundlor.enabled>

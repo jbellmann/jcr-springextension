@@ -2,9 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework</groupId>
+    <artifactId>se-jcr-parent</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <relativePath>../se-jcr-parent/pom.xml</relativePath>
+  </parent>
   <groupId>org.springframework</groupId>
-  <artifactId>se-jcr</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>se-jcr-jackrabbit-ocm</artifactId>
+  <packaging>jar</packaging>
   <version>2.0-SNAPSHOT</version>
   <name>Spring Extension JCR -- ${project.artifactId}</name>
   <url>http://www.springsource.org/extensions/se-jcr</url>
@@ -29,13 +35,6 @@
     </repository>
   </distributionManagement>
 
-    <modules>
-        <module>se-jcr-parent</module>
-        <module>se-jcr-commons</module>
-        <module>se-jcr-jackrabbit</module>
-        <module>se-jcr-jackrabbit-ocm</module>
-    </modules>
-
   <properties>
     <bundlor.enabled>true</bundlor.enabled>
     <bundle.version>2.0.0.SNAPSHOT</bundle.version>
@@ -51,6 +50,11 @@
   </properties>
 
   <dependencies>
+    <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>se-jcr-jackrabbit</artifactId>
+        <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
