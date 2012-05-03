@@ -691,7 +691,7 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
              * @see JcrCallback#doInJcr(javax.jcr.Session)
              */
             @Override
-            public Map doInJcr(Session session) throws RepositoryException {
+            public Map<String, QueryResult> doInJcr(Session session) throws RepositoryException {
                 // check language
                 String lang = language;
                 if (lang == null) {
