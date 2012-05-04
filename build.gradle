@@ -30,10 +30,11 @@ subprojects { subproject ->
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
 	apply plugin: 'bundlor'
+	apply plugin: 'signing'
 
 	// ensure JDK 5 compatibility (GRADLE-18; INT-1578)
-	sourceCompatibility=1.6
-	targetCompatibility=1.6
+	sourceCompatibility=1.7
+	targetCompatibility=1.7
 
 	ext {
 		aspectjVersion = '1.6.12'
@@ -119,6 +120,18 @@ subprojects { subproject ->
 	artifacts {
 		archives sourcesJar
 		archives javadocJar
+	}
+	
+	signing {
+		sign configurations.archives
+	}
+	
+	uploadArchives {
+		repositories {
+			mavenDeployer {
+				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+			}
+		}
 	}
 
 }
