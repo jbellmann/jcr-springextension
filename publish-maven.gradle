@@ -44,32 +44,9 @@ def customizePom(pom, gradleProject) {
 				}
 			}
 			scm {
-				url = 'https://github.com/SpringSource/spring-integration'
-				connection = 'scm:git:git://github.com/SpringSource/spring-integration'
-				developerConnection = 'scm:git:git://github.com/SpringSource/spring-integration'
-			}
-
-			developers {
-				developer {
-					id = 'markfisher'
-					name = 'Mark Fisher'
-					email = 'markfisher@vmware.com'
-				}
-				developer {
-					id = 'olegz'
-					name = 'Oleg Zhurakousky'
-					email = 'ozhurakousky@vmware.com'
-				}
-				developer {
-					id = 'garyrussell'
-					name = 'Gary Russell'
-					email = 'grussell@vmware.com'
-				}
-				developer {
-					id = 'ghillert'
-					name = 'Gunnar Hillert'
-					email = 'ghillert@vmware.com'
-				}
+				url = 'https://jbellmann@github.com/jbellmann/jcr-springextension.git'
+				connection = 'scm:git:git://github.com/jbellmann/jcr-springextension.git'
+				developerConnection = 'scm:git:git://github.com/jbellmann/jcr-springextension.git'
 			}
 		}
 	}
