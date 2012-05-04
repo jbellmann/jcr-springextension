@@ -1,0 +1,5 @@
+rootProject.name = 'se-jcr'
+
+include 'se-jcr-commons'
+include 'se-jcr-jackrabbit'
+include 'se-jcr-jackrabbit-ocm'
