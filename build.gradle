@@ -13,7 +13,11 @@ buildscript {
 	}
 }
 
-allprojects {
+configure(allprojects) {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	
 	group = 'org.springframework'
 
 	repositories {
@@ -23,12 +27,9 @@ allprojects {
 	}
 }
 
-subprojects { subproject ->
+configure(subprojects) { subproject ->
 
-	apply plugin: 'java'
 	apply from:   "${rootProject.projectDir}/publish-maven.gradle"
-	apply plugin: 'eclipse'
-	apply plugin: 'idea'
 	apply plugin: 'bundlor'
 	apply plugin: 'signing'
 
@@ -50,6 +51,19 @@ subprojects { subproject ->
 		springVersion = '3.1.1.RELEASE'
 		jackrabbitVersion = '2.4.1'
 		jackrabbitOcmVersion = '1.5.3'
+		isReleaseVersion = !version.endsWith("SNAPSHOT")
+	}
+	
+	jar {
+		manifest.attributes['Implementation-Title'] = subproject.name
+		manifest.attributes['Implementation-Version'] = subproject.version
+
+		from("${rootProject.projectDir}/src/dist") {
+			include "license.txt"
+			//include "notice.txt"
+			into "META-INF"
+			expand(copyright: new Date().format('yyyy'), version: project.version)
+		}
 	}
 
 	eclipse {
@@ -123,6 +137,7 @@ subprojects { subproject ->
 	}
 	
 	signing {
+		required {isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives")}
 		sign configurations.archives
 	}
 	
