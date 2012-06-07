@@ -212,9 +212,9 @@ public class JcrMappingTemplate extends JcrTemplate implements JcrMappingOperati
 
     @Override
     public Collection getObjects(final Query query) {
-        return execute(new JcrMappingCallback<Collection>() {
+        return execute(new JcrMappingCallback<Collection<?>>() {
             @Override
-            public Collection doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
+            public Collection<?> doInJcrMapping(ObjectContentManager manager) throws JcrMappingException {
                 return manager.getObjects(query);
             }
         }, true);

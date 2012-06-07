@@ -1,3 +1,5 @@
+import com.sun.corba.se.spi.activation.Repository;
+
 description = 'Springextension JCR'
 
 apply plugin: 'base'
@@ -34,12 +36,12 @@ configure(subprojects) { subproject ->
 	apply plugin: 'signing'
 
 	// ensure JDK 5 compatibility (GRADLE-18; INT-1578)
-	sourceCompatibility=1.7
-	targetCompatibility=1.7
+	sourceCompatibility=1.6
+	targetCompatibility=1.6
 
 	ext {
 		aspectjVersion = '1.6.12'
-		cglibVersion = '2.2'
+		cglibVersion = '2.2.2'
 		commonsNetVersion = '3.0.1'
 		easymockVersion = '3.1'
 		groovyVersion = '1.8.5'
@@ -51,7 +53,7 @@ configure(subprojects) { subproject ->
 		springVersion = '3.1.1.RELEASE'
 		jackrabbitVersion = '2.4.1'
 		jackrabbitOcmVersion = '1.5.3'
-		isReleaseVersion = !version.endsWith("SNAPSHOT")
+		isReleaseVersion = version.endsWith("RELEASE")
 	}
 	
 	jar {
@@ -145,6 +147,7 @@ configure(subprojects) { subproject ->
 		repositories {
 			mavenDeployer {
 				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                repository (url: mavenRepoUrl)
 			}
 		}
 	}
