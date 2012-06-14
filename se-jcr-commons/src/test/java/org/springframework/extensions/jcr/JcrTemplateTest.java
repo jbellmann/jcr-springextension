@@ -841,7 +841,7 @@ public class JcrTemplateTest {
     @Test
     public void testGetTree() throws RepositoryException {
         try {
-            jcrTemplate.query((List) null);
+            jcrTemplate.query((List<String>) null);
             fail("should have thown IllegalArgumentException");
         } catch (IllegalArgumentException e) {
             // it's okay
