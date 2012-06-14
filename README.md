@@ -6,13 +6,15 @@
 
 ## How to build
 
-This project uses Maven to build all artifacts.
+This project uses Gradle to build all artifacts.
 
 Check out the source with:
 
 `git clone https://github.com/jbellmann/jcr-springextension.git`
 
-then `mvn install` will do the build.
+if you have Gradle installed you can build the project with `gradle build`
+
+if you have not installed Gradle yet, run the wrapper with `./gradlew build` on linux or `gradlew.bat build` on windows.
 
 ## Branches
 
