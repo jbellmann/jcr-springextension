@@ -49,9 +49,9 @@ configure(subprojects) { subproject ->
 		log4jVersion = '1.2.16'
 		slf4jVersion = '1.6.4'
 		mockitoVersion = '1.9.0'
-		springVersion = '3.1.1.RELEASE'
-		jackrabbitVersion = '2.4.1'
-		jackrabbitOcmVersion = '1.5.3'
+		springVersion = '3.1.2.RELEASE'
+		jackrabbitVersion = '2.4.2'
+		jackrabbitOcmVersion = '2.0.0'
 		isReleaseVersion = version.endsWith("RELEASE")
 	}
 	
@@ -223,7 +223,7 @@ project('se-jcr-jackrabbit-ocm') {
 	description = 'Springextension JCR -- jackrabbit-ocm'
 	dependencies {
 		compile project(":se-jcr-jackrabbit")
-		compile "org.apache.jackrabbit:jackrabbit-ocm:$jackrabbitOcmVersion"
+		compile "org.apache:jackrabbit-ocm:$jackrabbitOcmVersion"
 		compile "org.slf4j:slf4j-api:$slf4jVersion"
 	}
 	bundlor {
@@ -250,5 +250,5 @@ project('se-jcr-jackrabbit-ocm') {
 
 task wrapper(type: Wrapper) {
 	description = 'Generates gradlew[.bat] scripts'
-	gradleVersion = '1.0'
+	gradleVersion = '1.1'
 }
