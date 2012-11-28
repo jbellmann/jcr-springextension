@@ -382,18 +382,17 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void importXML(final String parentAbsPath, final InputStream in, final int uuidBehavior) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 try {
                     session.importXML(parentAbsPath, in, uuidBehavior);
                 } catch (IOException e) {
                     throw new JcrSystemException(e);
                 }
-                return null;
             }
         }, true);
     }
@@ -403,14 +402,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void refresh(final boolean keepChanges) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 session.refresh(keepChanges);
-                return null;
             }
         }, true);
     }
@@ -420,15 +418,14 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void removeLockToken(final String lt) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 //                session.removeLockToken(lt);
                 session.getWorkspace().getLockManager().removeLockToken(lt);
-                return null;
             }
         }, true);
     }
@@ -438,14 +435,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void rename(final Node node, final String newName) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 session.move(node.getPath(), node.getParent().getPath() + "/" + newName);
-                return null;
             }
         }, true);
     }
@@ -456,14 +452,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void setNamespacePrefix(final String prefix, final String uri) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 session.setNamespacePrefix(prefix, uri);
-                return null;
             }
         }, true);
     }
@@ -505,14 +500,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void move(final String srcAbsPath, final String destAbsPath) {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 session.move(srcAbsPath, destAbsPath);
-                return null;
             }
         }, true);
     }
@@ -522,14 +516,13 @@ public class JcrTemplate extends JcrAccessor implements JcrOperations {
      */
     @Override
     public void save() {
-        execute(new JcrCallback<Void>() {
+        execute(new JcrCallbackWithoutResult() {
             /**
-             * @see org.springframework.extensions.jcr.JcrCallback#doInJcr(javax.jcr.Session)
+             * @see org.springframework.extensions.jcr.JcrCallbackWithoutResult#doInJcrwithoutResult(javax.jcr.Session)
              */
             @Override
-            public Void doInJcr(Session session) throws RepositoryException {
+            protected void doInJcrWithoutResult(Session session) throws RepositoryException {
                 session.save();
-                return null;
             }
         }, true);
     }
