@@ -1,8 +1,6 @@
 # JCR Spring-Extension
 ## What is JCR Spring-Extension?
 
-hallo anke
-
 * It is an clone/fork from [here] (https://src.springframework.org/svn/se-jcr/)
 * It is not listed as an official [Spring-Extension](http://www.springsource.org/extensions)
 
