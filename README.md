@@ -1,4 +1,8 @@
 # JCR Spring-Extension
+
+[![Build Status](https://travis-ci.org/jbellmann/jsc-springextension.png)](https://travis-ci.org/jbellmann/jcr-springextension)
+
+
 ## What is JCR Spring-Extension?
 
 * It is an clone/fork from [here] (https://src.springframework.org/svn/se-jcr/)
