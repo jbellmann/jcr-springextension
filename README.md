@@ -1,6 +1,6 @@
 # JCR Spring-Extension
 
-[![Build Status](https://travis-ci.org/jbellmann/jsc-springextension.png)](https://travis-ci.org/jbellmann/jcr-springextension)
+[![Build Status](https://travis-ci.org/jbellmann/jcr-springextension.png)](https://travis-ci.org/jbellmann/jcr-springextension)
 
 
 ## What is JCR Spring-Extension?
