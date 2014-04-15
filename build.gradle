@@ -47,7 +47,7 @@ configure(subprojects) { subproject ->
 		log4jVersion = '1.2.16'
 		slf4jVersion = '1.6.4'
 		mockitoVersion = '1.9.0'
-		springVersion = '3.1.2.RELEASE'
+		springVersion = '4.0.0.RELEASE'
 		jackrabbitVersion = '2.6.2'
 		jackrabbitOcmVersion = '2.0.0'
 		isReleaseVersion = version.endsWith("RELEASE")
@@ -94,6 +94,7 @@ configure(subprojects) { subproject ->
 		testCompile "org.easymock:easymockclassextension:$easymockVersion"
 		testCompile "org.hamcrest:hamcrest-all:1.1"
 		testCompile "org.mockito:mockito-all:$mockitoVersion"
+		testCompile "org.apache.geronimo.specs:geronimo-servlet_3.0_spec:1.0"
 		testCompile "org.springframework:spring-test:$springVersion"
 		jacoco group: "org.jacoco", name: "org.jacoco.agent", version: "0.5.6.201201232323", classifier: "runtime"
 	}
