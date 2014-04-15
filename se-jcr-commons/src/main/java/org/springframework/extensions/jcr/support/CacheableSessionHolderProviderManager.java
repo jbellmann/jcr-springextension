@@ -18,7 +18,7 @@ package org.springframework.extensions.jcr.support;
 import javax.jcr.Repository;
 
 import org.springframework.extensions.jcr.SessionHolderProvider;
-import org.springframework.util.CachingMapDecorator;
+import org.springframework.extensions.jcr.util.CachingMapDecorator;
 
 /**
  * Manager which caches providers in order to avoid lookups.
@@ -43,7 +43,7 @@ public abstract class CacheableSessionHolderProviderManager extends AbstractSess
         }
 
         /**
-         * @see org.springframework.util.CachingMapDecorator#create(java.lang.Object)
+         * @see org.springframework.extensions.jcr.util.CachingMapDecorator#create(java.lang.Object)
          */
         @Override
         protected SessionHolderProvider create(Repository key) {
