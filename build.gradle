@@ -5,11 +5,11 @@ apply plugin: 'idea'
 
 buildscript {
 	repositories {
-		maven { url 'https://repo.springsource.org/plugins-snapshot' }
+		maven { url 'https://repo.spring.io/plugins-release' }
 	}
 	dependencies {
 		classpath 'org.springframework.build.gradle:bundlor-plugin:0.1.2'
-		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.1.5'
+		classpath 'org.springframework.build.gradle:docbook-reference-plugin:0.2.8'
 	}
 }
 
@@ -22,8 +22,10 @@ configure(allprojects) {
 
 	repositories {
 		mavenCentral()
-		maven { url 'http://repo.springsource.org/libs-milestone' }
-		maven { url 'http://repo.springsource.org/plugins-release' } // for bundlor
+        maven { url 'http://repo.springsource.org/plugins-release' } // for bundlor
+        maven { url "http://repo.spring.io/libs-release" }
+        maven { url "http://repo.spring.io/milestone" }  // for AspectJ 1.8.0.RC3
+        maven { url "http://repo.spring.io/snapshot" }  // temporarily until Reactor 1.1.0.M4
 	}
 }
 
@@ -43,12 +45,12 @@ configure(subprojects) { subproject ->
 		easymockVersion = '3.1'
 		groovyVersion = '1.8.5'
 		javaxActivationVersion = '1.1.1'
-		junitVersion = '4.10'
-		log4jVersion = '1.2.16'
-		slf4jVersion = '1.6.4'
-		mockitoVersion = '1.9.0'
-		springVersion = '4.0.0.RELEASE'
-		jackrabbitVersion = '2.6.2'
+		junitVersion = '4.11'
+		log4jVersion = '1.2.17'
+		slf4jVersion = '1.7.6'
+		mockitoVersion = '1.9.5'
+		springVersion = '4.0.3.RELEASE'
+		jackrabbitVersion = '2.7.5'
 		jackrabbitOcmVersion = '2.0.0'
 		isReleaseVersion = version.endsWith("RELEASE")
 	}

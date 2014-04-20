@@ -6,3 +6,6 @@ build
 .gradle
 data
 bin
+*.iml
+*.ipr
+*.iws
